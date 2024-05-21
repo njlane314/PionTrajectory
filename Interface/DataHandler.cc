@@ -6,19 +6,11 @@ DataHandler* DataHandler::m_Instance = nullptr;
 //_________________________________________________________________________________________
 DataHandler* DataHandler::GetInstance() 
 {
-    if (m_Instance == nullptr) {
+    if(m_Instance == nullptr){
         m_Instance = new DataHandler();
     }
 
     return m_Instance;
-}
-//_________________________________________________________________________________________
-DataHandler::~DataHandler() 
-{
-    if (m_RootFile) {
-        m_RootFile->Close();
-        delete m_RootFile;
-    }
 }
 //_________________________________________________________________________________________
 DataHandler::DataHandler(const char* filename)
@@ -40,6 +32,14 @@ DataHandler::DataHandler(const char* filename)
     m_ScatTree->Branch("scat_inelas", &m_scat_inelas);
     m_ScatTree->Branch("scat_pfls", &m_scat_pfls);
     m_ScatTree->Branch("scat_thta", &m_scat_thta);
+}
+//_________________________________________________________________________________________
+DataHandler::~DataHandler() 
+{
+    if (m_RootFile){
+        m_RootFile->Close();
+        delete m_RootFile;
+    }
 }
 //_________________________________________________________________________________________
 void DataHandler::AddTrajectory(const art::Ptr<simb::MCParticle> part) 
@@ -68,13 +68,13 @@ void DataHandler::AddTrajectory(const art::Ptr<simb::MCParticle> part)
     m_traj_pz.push_back(traj_pz);
 }
 //_________________________________________________________________________________________
-void DataHandler::AddScatter(const Scatter* scat)
+void DataHandler::AddScatter(const Scatter& scat)
 {
-    m_scat_elas.push_back(scat->isElastic());
-    m_scat_inelas.push_back(scat->isInelastic());
+    m_scat_elas.push_back(scat.isElastic());
+    m_scat_inelas.push_back(scat.isInelastic());
 
-    m_scat_pfls.push_back(scat->MomentumFractionLoss());
-    m_scat_thta.push_back(scat->CosTheta());
+    m_scat_pfls.push_back(scat.MomentumFractionLoss());
+    m_scat_thta.push_back(scat.CosTheta());
 }
 //_________________________________________________________________________________________
 void DataHandler::AddEntry() 

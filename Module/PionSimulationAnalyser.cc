@@ -6,7 +6,7 @@ PionSimulationAnalyser::PionSimulationAnalyser(art::Event const& event)
 {
    m_ConfigManager = ConfigManager::GetInstance();
 
-   if(!event.getByLabel(m_ConfigManager.getSimulationLabel(), m_SimHandle));
+   if(!event.getByLabel(m_ConfigManager->getSimulationLabel(), m_SimHandle));
 
    art::fill_ptr_vector(m_SimParticles, m_SimHandle);
 
@@ -19,29 +19,31 @@ PionSimulationAnalyser::PionSimulationAnalyser(art::Event const& event)
 //_________________________________________________________________________________________
 void PionSimulationAnalyser::AnalyseEvent(art::Event const& event)
 {  
-   for(const art::Ptr<simb::MCParticle> &particle : m_SimParticles){
-      if(isChargedPion(particle->PdgCode()) && particle->Process() == "Primary"){
+   for(const art::Ptr<simb::MCParticle> &initialParticle : m_SimParticles){
+      if(isChargedPion(initialParticle->PdgCode()) && initialParticle->Process() == "Primary"){
          DataHandler::GetInstance()->Reset();
-         DataHandler::GetInstance()->AddTrajectory(particle);
+         DataHandler::GetInstance()->AddTrajectory(initialParticle);
 
          bool pionScattering = false;
+         art::Ptr<simb::MCParticle> particle = initialParticle; // Create a non-const copy
          while(!pionScattering){  
             follow_scatter: 
-            
-            for(const auto daughter : FindDaughters(particle)){
+
+            std::vector<art::Ptr<simb::MCParticle>> daughters = FindDaughters(particle);
+            for(const auto& daughter : daughters){
                if(!isChargedPion(daughter->PdgCode())) continue;
 
                if(daughter->Process() == "hadElastic"){
                   Scatter scatter(true, false, particle, daughter, daughters);
-                  DataHandler::GetInstance->AddScatter(scatter);
+                  DataHandler::GetInstance()->AddScatter(scatter);
 
-                  particle = daughter;
+                  particle = daughter; 
                   DataHandler::GetInstance()->AddTrajectory(particle);
                   goto follow_scatter;
                }
                else if(daughter->Process() == "Inelastic"){
                   Scatter scatter(false, true, particle, daughter, daughters);
-                  DataHandler::GetInstance->AddScatter(scatter);
+                  DataHandler::GetInstance()->AddScatter(scatter);
 
                   particle = daughter;
                   DataHandler::GetInstance()->AddTrajectory(particle);
@@ -50,17 +52,17 @@ void PionSimulationAnalyser::AnalyseEvent(art::Event const& event)
             }
          }
 
+         std::vector<art::Ptr<simb::MCParticle>> products;
          for(const auto finalParticle : FindDaughters(particle)){
-            std::vector<art::Ptr<simb::MCParticle>> products;
             if((finalParticle->PdgCode() == 11 && finalParticle->Process() == "hIoni") || finalParticle->Process() == "hadElastic")
                   continue;
             
             products.push_back(finalParticle); 
          }
 
-         finalState FinalState::FinalState(particle, products);
-         DataHandler::GetInstance->AddFinalState(finalState);
-         DataHandler::GetInstance->AddEntry(); 
+         FinalState finalState(particle, products);
+         //DataHandler::GetInstance()->AddFinalState(finalState);
+         DataHandler::GetInstance()->AddEntry(); 
       }
    }
 }

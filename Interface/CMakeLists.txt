@@ -41,6 +41,8 @@ art_make(
         ${ROOT_GDML}
         ${ROOT_BASIC_LIB_LIST}
         ${ROOT_GENVECTOR}
+
+        ubpiontraj_Objects
     )
 
 install_headers()

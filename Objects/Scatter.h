@@ -13,7 +13,6 @@ namespace ubpiontraj
    class Scatter {
    public:
       Scatter(bool isElastic, bool isInelastic, 
-               const TVector3& initialMomentum, const TVector3& finalMomentum,
                const art::Ptr<simb::MCParticle>& incidentParticle, 
                const art::Ptr<simb::MCParticle>& scatterParticle,
                const std::vector<art::Ptr<simb::MCParticle>>& products);
@@ -22,9 +21,6 @@ namespace ubpiontraj
 
       bool isElastic() const;
       bool isInelastic() const;
-
-      TVector3 initialMomentum() const;
-      TVector3 finalMomentum() const;
 
       art::Ptr<simb::MCParticle> incidentParticle() const;
       art::Ptr<simb::MCParticle> scatterParticle() const;
@@ -38,9 +34,6 @@ namespace ubpiontraj
       bool m_isElastic;
       bool m_isInelastic;
 
-      TVector3 m_initialMomentum;
-      TVector3 m_finalMomentum;
-
       art::Ptr<simb::MCParticle> m_incidentParticle;
       art::Ptr<simb::MCParticle> m_scatterParticle;
 
@@ -48,12 +41,10 @@ namespace ubpiontraj
    };
 
    Scatter::Scatter(bool isElastic, bool isInelastic, 
-                  const TVector3& initialMomentum, const TVector3& finalMomentum,
                   const art::Ptr<simb::MCParticle>& incidentParticle, 
                   const art::Ptr<simb::MCParticle>& scatterParticle,
                   const std::vector<art::Ptr<simb::MCParticle>>& products)
       : m_isElastic(isElastic), m_isInelastic(isInelastic),
-         m_initialMomentum(initialMomentum), m_finalMomentum(finalMomentum),
          m_incidentParticle(incidentParticle), m_scatterParticle(scatterParticle),
          m_products(products) {}
 
@@ -65,14 +56,6 @@ namespace ubpiontraj
 
    bool Scatter::isInelastic() const {
       return m_isInelastic;
-   }
-
-   TVector3 Scatter::initialMomentum() const {
-      return m_initialMomentum;
-   }
-
-   TVector3 Scatter::finalMomentum() const {
-      return m_finalMomentum;
    }
 
    art::Ptr<simb::MCParticle> Scatter::incidentParticle() const {
@@ -88,8 +71,8 @@ namespace ubpiontraj
    }
 
    double Scatter::MomentumFractionLoss() const {
-      double initialMagnitude = m_initialMomentum.Mag();
-      double finalMagnitude = m_finalMomentum.Mag();
+      double initialMagnitude = m_incidentParticle->EndMomentum().Mag();
+      double finalMagnitude = m_scatterParticle->EndMomentum().Mag();
 
       if (initialMagnitude == 0) {
          return 0;
@@ -99,10 +82,10 @@ namespace ubpiontraj
    }
 
    double Scatter::CosTheta() const {
-      double dotProduct = m_initialMomentum.Dot(m_finalMomentum);
+      double dotProduct = m_incidentParticle->EndMomentum().Dot(m_scatterParticle->EndMomentum());
 
-      double initialMagnitude = m_initialMomentum.Mag();
-      double finalMagnitude = m_finalMomentum.Mag();
+      double initialMagnitude = m_incidentParticle->EndMomentum().Mag();
+      double finalMagnitude = m_scatterParticle->EndMomentum().Mag();
 
       if (initialMagnitude == 0 || finalMagnitude == 0) {
          return 0;

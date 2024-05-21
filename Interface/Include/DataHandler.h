@@ -27,7 +27,7 @@ namespace ubpiontraj
       DataHandler& operator=(const DataHandler&) = delete;
 
       void AddTrajectory(const art::Ptr<simb::MCParticle> part);
-      void AddScatter(const Scatter* scat);
+      void AddScatter(const Scatter& scat);
       
       void AddEntry();
       void WriteFile();
@@ -49,4 +49,4 @@ namespace ubpiontraj
    };
 }
 
-#endif  // DATAHANDLER_H
+#endif // DATAHANDLER_H

@@ -9,4 +9,4 @@ namespace ubpiontraj
    inline bool isMuonNeutrino(int pdg){ return abs(pdg) == 14; }
 }
 
-#endif  // PARTICLETYPES_H
+#endif // PARTICLETYPES_H

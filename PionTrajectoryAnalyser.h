@@ -1,3 +1,6 @@
+#ifndef PIONTRAJECTORYANALYSER_H
+#define PIONTRAJECTORYANALYSER_H
+
 #include <vector>
 #include <string>
 
@@ -29,19 +32,19 @@
 
 namespace ubpiontraj 
 {
-   class PionTrajectoryAnalsyer;
+   class PionTrajectoryAnalyser;
 }
 
-class ubpiontraj::PionTrajectoryAnalsyer : public art::EDAnalyzer 
+class ubpiontraj::PionTrajectoryAnalyser : public art::EDAnalyzer 
 {
    public:
 
-      explicit PionTrajectoryAnalsyer(fhicl::ParameterSet const& p);
+      explicit PionTrajectoryAnalyser(fhicl::ParameterSet const& p);
 
-      PionTrajectoryAnalsyer(PionTrajectoryAnalsyer const&) = delete;
-      PionTrajectoryAnalsyer(PionTrajectoryAnalsyer&&) = delete;
-      PionTrajectoryAnalsyer& operator=(PionTrajectoryAnalsyer const&) = delete;
-      PionTrajectoryAnalsyer& operator=(PionTrajectoryAnalsyer&&) = delete;
+      PionTrajectoryAnalyser(PionTrajectoryAnalyser const&) = delete;
+      PionTrajectoryAnalyser(PionTrajectoryAnalyser&&) = delete;
+      PionTrajectoryAnalyser& operator=(PionTrajectoryAnalyser const&) = delete;
+      PionTrajectoryAnalyser& operator=(PionTrajectoryAnalyser&&) = delete;
 
       void analyze(art::Event const& e) override;
 
@@ -54,6 +57,9 @@ class ubpiontraj::PionTrajectoryAnalsyer : public art::EDAnalyzer
       void endSubRun(const art::SubRun& sr);
 
    private:
-      ConfigManager& m_config;
-      DataHandler m_dataHandler; 
+
+      ConfigManager* m_config;
+      DataHandler* m_dataHandler; 
 };
+
+#endif // PIONTRAJECTORYANALYSER_H

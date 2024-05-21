@@ -1,10 +1,11 @@
 #include "PionTrajectoryAnalyser.h"
 //_________________________________________________________________________________________
-ubpiontraj::PionTrajectoryAnalyser::PionTrajectoryAnalyser(fhicl::ParameterSet const& p)
-   : EDAnalyzer{p}, 
-   m_config(ConfigManager::Initialise(p)) //,
-   //m_dataHandler(std::make_unique<DataHandler>())
-{}
+ubpiontraj::PionTrajectoryAnalyser::PionTrajectoryAnalyser(fhicl::ParameterSet const& p) : 
+   EDAnalyzer{p}
+{
+   m_config = ConfigManager::GetInstance(p);
+   m_dataHandler = DataHandler::GetInstance();
+}
 //_________________________________________________________________________________________
 void ubpiontraj::PionTrajectoryAnalyser::analyze(art::Event const& e)
 {

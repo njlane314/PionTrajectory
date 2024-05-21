@@ -49,7 +49,9 @@ art_make(
 			${ROOT_BASIC_LIB_LIST}
 			${ROOT_GENVECTOR}
 
-			ubneutkaon_Interface 
+			ubpiontraj_Interface 
+			ubpiontraj_Module
+			ubpiontraj_Objects
 )
 
 install_headers()

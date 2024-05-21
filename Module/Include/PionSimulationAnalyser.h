@@ -39,7 +39,8 @@ namespace ubpiontraj
 
       art::Handle<std::vector<simb::MCParticle>> m_SimHandle;
       std::vector<art::Ptr<simb::MCParticle>> m_SimParticles;
-      std::vector<std::pair<int, art::Ptr<simb::MCParticle>>> m_SimParticleMap;
+
+      std::map<int, art::Ptr<simb::MCParticle>> m_SimParticleMap;
 
       std::vector<art::Ptr<simb::MCParticle>> FindDaughters(const art::Ptr<simb::MCParticle> particle);
    };
