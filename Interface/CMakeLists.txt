@@ -1,6 +1,6 @@
 art_make(
-    LIBRARY_NAME
-        ubpiontraj_Interface
+    
+    LIBRARY_NAME    ubpiontraj_Interface
 
     LIB_LIBRARIES
         larcorealg_Geometry
@@ -41,8 +41,6 @@ art_make(
         ${ROOT_GDML}
         ${ROOT_BASIC_LIB_LIST}
         ${ROOT_GENVECTOR}
-
-        ubpiontraj_Objects
     )
 
 install_headers()

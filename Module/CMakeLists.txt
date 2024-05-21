@@ -40,7 +40,7 @@ art_make(
             ${ROOT_GDML}
             ${ROOT_BASIC_LIB_LIST}
 
-            ubpiontraj_Objects
+            ubpiontraj_Interface
 )
 
 install_headers()

@@ -51,7 +51,6 @@ art_make(
 
 			ubpiontraj_Interface 
 			ubpiontraj_Module
-			ubpiontraj_Objects
 )
 
 install_headers()
