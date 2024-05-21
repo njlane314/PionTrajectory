@@ -6,6 +6,8 @@
 
 #include "nusimdata/SimulationBase/MCParticle.h"
 
+#include "ubana/PionTrajectory/Interface/Include/ParticleTypes.h"
+
 namespace ubpiontraj
 {
    class Scatter {
@@ -29,8 +31,8 @@ namespace ubpiontraj
 
       std::vector<art::Ptr<simb::MCParticle>> products() const;
 
-      double momentumFractionLoss() const;
-      double cosTheta() const;
+      double MomentumFractionLoss() const;
+      double CosTheta() const;
 
    private:
       bool m_isElastic;
@@ -85,7 +87,7 @@ namespace ubpiontraj
       return m_products;
    }
 
-   double Scatter::momentumFractionLoss() const {
+   double Scatter::MomentumFractionLoss() const {
       double initialMagnitude = m_initialMomentum.Mag();
       double finalMagnitude = m_finalMomentum.Mag();
 
@@ -96,7 +98,7 @@ namespace ubpiontraj
       return (initialMagnitude - finalMagnitude) / initialMagnitude;
    }
 
-   double Scatter::cosTheta() const {
+   double Scatter::CosTheta() const {
       double dotProduct = m_initialMomentum.Dot(m_finalMomentum);
 
       double initialMagnitude = m_initialMomentum.Mag();

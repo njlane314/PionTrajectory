@@ -1,7 +1,7 @@
 #include "PionTrajectoryAnalyser.h"
 //_________________________________________________________________________________________
 ubpiontraj::PionTrajectoryAnalyser::PionTrajectoryAnalyser(fhicl::ParameterSet const& p)
-   : EDAnalyzer{p},
+   : EDAnalyzer{p}, 
    m_config(ConfigManager::Initialise(p)) //,
    //m_dataHandler(std::make_unique<DataHandler>())
 {}

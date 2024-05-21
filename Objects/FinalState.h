@@ -6,12 +6,13 @@
 
 #include "nusimdata/SimulationBase/MCParticle.h"
 
+#include "ubana/PionTrajectory/Interface/Include/ParticleTypes.h"
+
 namespace ubpiontraj 
 {
    class FinalState {
    public:
-      FinalState(const TVector3& finalParticleMomentum, 
-                 const std::vector<art::Ptr<simb::MCParticle>>& products);
+      FinalState(const art::Ptr<simb::MCParticle>& mother, const std::vector<art::Ptr<simb::MCParticle>>& products);
 
       ~FinalState();
 
@@ -24,48 +25,45 @@ namespace ubpiontraj
       };
 
       Type getType() const;
-      TVector3 getFinalParticleMomentum() const;
       const std::vector<art::Ptr<simb::MCParticle>>& getProducts() const;
 
       void print() const;
 
    private:
       Type m_type;
-      TVector3 m_finalParticleMomentum;
+      art::Ptr<simb::MCParticle> m_mother;
       std::vector<art::Ptr<simb::MCParticle>> m_products;
    };
 
-   FinalState::FinalState(const Type type, const TVector3& finalParticleMomentum, 
-                          const std::vector<art::Ptr<simb::MCParticle>>& products)
-      : m_type(type), m_finalParticleMomentum(finalParticleMomentum), m_products(products) {
-         FinalState::Type type = FinalState::Type::Other; 
+   FinalState::FinalState(const art::Ptr<simb:: MCParticle>& mother, const std::vector<art::Ptr<simb::MCParticle>>& products)
+      : m_type(Type::Other), m_mother(mother), m_products(products) {
          
-         bool hasNeutralParticle = false;
+         bool hasNeutralPion = false;
          bool hasMuon = false;
-         bool hasNeutrino = false;
+         bool hasMuonNeutrino = false;
 
          for(const auto particle : m_products){
-            if(isNeutralPion(finalParticle->PdgCode()) && finalParticle->Process() == "pi+inelastic"){
+            if(isNeutralPion(particle->PdgCode()) && particle->Process() == "pi+inelastic"){
                hasNeutralPion = true;
             }
 
-            if(isMuon(finalParticle->PdgCode()) && finalParticle->Process() == "Decay"){
+            if(isMuonLepton(particle->PdgCode()) && particle->Process() == "Decay"){
                hasMuon = true; 
             }
 
-            if(isMuonNeutrino(finalParticle->PdgCode()) && finalParticle->Process() == "Decay"){
-               hasNeutrino = true;
+            if(isMuonNeutrino(particle->PdgCode()) && particle->Process() == "Decay"){
+               hasMuonNeutrino = true;
             }
          }
 
-         if(products.empty()){
-            type = FinalState::Type::None;
+         if(m_products.empty()){
+            m_type = FinalState::Type::None;
          }
-         else if (hasMuon && hasMuonNeutrino && products.size() == 2){
-            type = EndState::Type::DecayToMuon;
+         else if(hasMuon && hasMuonNeutrino && m_products.size() == 2){
+            m_type = FinalState::Type::DecayToMuon;
          }
-         else if (particle->EndProcess() == "pi+Inelastic"){
-            type = hasPi0 ? EndState::Type::Pi0ChargeExchange : EndState::Type::InelasticAbsorption;
+         else if(m_mother->EndProcess() == "pi+Inelastic"){
+            m_type = hasNeutralPion ? FinalState::Type::NeutralPionChargeExchange : FinalState::Type::InelasticAbsorption;
          }
       }
 
@@ -75,18 +73,12 @@ namespace ubpiontraj
       return m_type;
    }
 
-   TVector3 FinalState::getFinalParticleMomentum() const {
-      return m_finalParticleMomentum;
-   }
-
    const std::vector<art::Ptr<simb::MCParticle>>& FinalState::getProducts() const {
       return m_products;
    }
 
    void FinalState::print() const {
       std::cout << "Interaction Type: " << m_type << "\n"
-                << "Final Particle Momentum: (" << m_finalParticleMomentum.X() << ", " 
-                << m_finalParticleMomentum.Y() << ", " << m_finalParticleMomentum.Z() << ")\n"
                 << "Number of Products: " << m_products.size() << "\n";
 
       for (const auto& product : m_products) {

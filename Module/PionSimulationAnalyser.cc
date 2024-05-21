@@ -1,8 +1,8 @@
 #include "Include/PionSimulationAnalyser.h"
 //_________________________________________________________________________________________
-namespace ub_pion_trajectory {
+namespace ubpiontraj {
 //_________________________________________________________________________________________
-PionSimulationAnalyser::PionSimulationAnalyser(art::Event const& event) :
+PionSimulationAnalyser::PionSimulationAnalyser(art::Event const& event)
 {
    m_ConfigManager = ConfigManager::GetInstance();
 
@@ -20,16 +20,16 @@ PionSimulationAnalyser::PionSimulationAnalyser(art::Event const& event) :
 void PionSimulationAnalyser::AnalyseEvent(art::Event const& event)
 {  
    for(const art::Ptr<simb::MCParticle> &particle : m_SimParticles){
-      if(isPion(particle->PdgCode()) && particle->Process() == "Primary"){
+      if(isChargedPion(particle->PdgCode()) && particle->Process() == "Primary"){
          DataHandler::GetInstance()->Reset();
          DataHandler::GetInstance()->AddTrajectory(particle);
 
          bool pionScattering = false;
-         while(!pionScatering){  
+         while(!pionScattering){  
             follow_scatter: 
             
             for(const auto daughter : FindDaughters(particle)){
-               if(!isPion(daughter->PdgCode())) continue;
+               if(!isChargedPion(daughter->PdgCode())) continue;
 
                if(daughter->Process() == "hadElastic"){
                   Scatter scatter(true, false, particle, daughter, daughters);
@@ -51,15 +51,15 @@ void PionSimulationAnalyser::AnalyseEvent(art::Event const& event)
          }
 
          for(const auto finalParticle : FindDaughters(particle)){
-            std::vector<art::Ptr<MCParticle>> products;
+            std::vector<art::Ptr<simb::MCParticle>> products;
             if((finalParticle->PdgCode() == 11 && finalParticle->Process() == "hIoni") || finalParticle->Process() == "hadElastic")
                   continue;
             
             products.push_back(finalParticle); 
          }
 
-         FinalState finalState();
-         DataHandler::GetInstance->AddFinalState();
+         finalState FinalState::FinalState(particle, products);
+         DataHandler::GetInstance->AddFinalState(finalState);
          DataHandler::GetInstance->AddEntry(); 
       }
    }

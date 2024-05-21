@@ -4,7 +4,7 @@ namespace ubpiontraj {
 //_________________________________________________________________________________________
 DataHandler* DataHandler::m_Instance = nullptr;
 //_________________________________________________________________________________________
-DataHandler* DataHandler::Instance() 
+DataHandler* DataHandler::GetInstance() 
 {
     if (m_Instance == nullptr) {
         m_Instance = new DataHandler();
@@ -44,21 +44,22 @@ DataHandler::DataHandler(const char* filename)
 //_________________________________________________________________________________________
 void DataHandler::AddTrajectory(const art::Ptr<simb::MCParticle> part) 
 {    
-    simb::MCTrajectory* traj = part->Trajectory();
+    const simb::MCTrajectory traj = part->Trajectory();
     
     std::vector<double> traj_x, traj_y, traj_z, traj_px, traj_py, traj_pz, traj_e;
+    int traj_n = traj.size(); 
 
-    for(int i = 0; i < traj->size(); i++){
-        traj_x.push_back(traj->X());
-        traj_y.push_back(traj->Y());
-        traj_z.push_back(traj->Z());
-        traj_px.push_back(traj->Px());
-        traj_py.push_back(traj->Py());
-        traj_pz.push_back(traj->Pz());
-        traj_e.push_back(traj->E());
+    for(int i = 0; i < traj_n; i++){
+        traj_x.push_back(traj.X(i));
+        traj_y.push_back(traj.Y(i));
+        traj_z.push_back(traj.Z(i));
+        traj_px.push_back(traj.Px(i));
+        traj_py.push_back(traj.Py(i));
+        traj_pz.push_back(traj.Pz(i));
+        traj_e.push_back(traj.E(i));
     }
 
-    m_traj_n.push_back(traj->size());
+    m_traj_n.push_back(traj_n);
     m_traj_x.push_back(traj_x);
     m_traj_y.push_back(traj_y);
     m_traj_z.push_back(traj_z);

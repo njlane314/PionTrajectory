@@ -25,22 +25,23 @@
 
 #include "Interface/Include/ConfigManager.h"
 #include "Interface/Include/DataHandler.h"
+#include "Module/Include/PionSimulationAnalyser.h"
 
 namespace ubpiontraj 
 {
-   class PionFinalStateAnalyser;
+   class PionTrajectoryAnalsyer;
 }
 
-class ubpiontraj::PionFinalStateAnalyser : public art::EDAnalyzer 
+class ubpiontraj::PionTrajectoryAnalsyer : public art::EDAnalyzer 
 {
    public:
 
-      explicit PionFinalStateAnalyser(fhicl::ParameterSet const& p);
+      explicit PionTrajectoryAnalsyer(fhicl::ParameterSet const& p);
 
-      PionFinalStateAnalyser(PionFinalStateAnalyser const&) = delete;
-      PionFinalStateAnalyser(PionFinalStateAnalyser&&) = delete;
-      PionFinalStateAnalyser& operator=(PionFinalStateAnalyser const&) = delete;
-      PionFinalStateAnalyser& operator=(PionFinalStateAnalyser&&) = delete;
+      PionTrajectoryAnalsyer(PionTrajectoryAnalsyer const&) = delete;
+      PionTrajectoryAnalsyer(PionTrajectoryAnalsyer&&) = delete;
+      PionTrajectoryAnalsyer& operator=(PionTrajectoryAnalsyer const&) = delete;
+      PionTrajectoryAnalsyer& operator=(PionTrajectoryAnalsyer&&) = delete;
 
       void analyze(art::Event const& e) override;
 
@@ -54,5 +55,5 @@ class ubpiontraj::PionFinalStateAnalyser : public art::EDAnalyzer
 
    private:
       ConfigManager& m_config;
-      //DataHandler m_dataHandler; 
+      DataHandler m_dataHandler; 
 };
