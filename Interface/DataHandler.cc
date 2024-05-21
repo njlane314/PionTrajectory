@@ -32,6 +32,11 @@ DataHandler::DataHandler(const char* filename)
     m_ScatTree->Branch("scat_inelas", &m_scat_inelas);
     m_ScatTree->Branch("scat_pfls", &m_scat_pfls);
     m_ScatTree->Branch("scat_thta", &m_scat_thta);
+
+    m_FinSttTree = new TTree("FinalStateTree", "Final State Tree");
+    m_FinSttTree->Branch("fstt_typ", &m_fstt_typ);
+    m_FinSttTree->Branch("fstt_nprd", &m_fstt_nprd);
+    m_FinSttTree->Branch("fstt_prdpdg", &m_fstt_prdpdg);
 }
 //_________________________________________________________________________________________
 DataHandler::~DataHandler() 
@@ -66,6 +71,7 @@ void DataHandler::AddTrajectory(const art::Ptr<simb::MCParticle> part)
     m_traj_px.push_back(traj_px);
     m_traj_py.push_back(traj_py);
     m_traj_pz.push_back(traj_pz);
+    m_traj_e.push_back(traj_e);
 }
 //_________________________________________________________________________________________
 void DataHandler::AddScatter(const Scatter& scat)
@@ -77,10 +83,40 @@ void DataHandler::AddScatter(const Scatter& scat)
     m_scat_thta.push_back(scat.CosTheta());
 }
 //_________________________________________________________________________________________
+int FinalStateTypeKey(FinalState::Type type) {
+    switch (type) {
+        case FinalState::DecayToMuon:
+            return 1;
+        case FinalState::InelasticAbsorption:
+            return 2;
+        case FinalState::NeutralPionChargeExchange:
+            return 3;
+        case FinalState::Other: 
+            return 0;
+        case FinalState::None:
+        default:
+            return -1;
+    }
+}
+//_________________________________________________________________________________________
+void DataHandler::AddFinalState(const FinalState& fstt)
+{
+    int type = FinalStateTypeKey(fstt.getType());
+    m_fstt_typ.push_back(type);
+    m_fstt_nprd.push_back(fstt.getProducts().size());
+
+    std::vector<int> prod_pdgs;
+    for (const auto& product : fstt.getProducts()) {
+        prod_pdgs.push_back(product->PdgCode());
+    }
+    m_fstt_prdpdg.push_back(prod_pdgs);
+}
+//_________________________________________________________________________________________
 void DataHandler::AddEntry() 
 {
     m_TrajTree->Fill();
     m_ScatTree->Fill();
+    m_FinSttTree->Fill();
 }
 void DataHandler::WriteFile() 
 {
@@ -102,6 +138,10 @@ void DataHandler::Reset()
     m_scat_inelas.clear();
     m_scat_pfls.clear();
     m_scat_thta.clear();
+
+    m_fstt_typ.clear();
+    m_fstt_nprd.clear();
+    m_fstt_prdpdg.clear();
 }
 //_________________________________________________________________________________________
 }

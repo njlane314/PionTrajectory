@@ -25,7 +25,7 @@ void PionSimulationAnalyser::AnalyseEvent(art::Event const& event)
          DataHandler::GetInstance()->AddTrajectory(initialParticle);
 
          bool pionScattering = false;
-         art::Ptr<simb::MCParticle> particle = initialParticle; // Create a non-const copy
+         art::Ptr<simb::MCParticle> particle = initialParticle; 
          while(!pionScattering){  
             follow_scatter: 
 
@@ -61,7 +61,7 @@ void PionSimulationAnalyser::AnalyseEvent(art::Event const& event)
          }
 
          FinalState finalState(particle, products);
-         //DataHandler::GetInstance()->AddFinalState(finalState);
+         DataHandler::GetInstance()->AddFinalState(finalState);
          DataHandler::GetInstance()->AddEntry(); 
       }
    }
