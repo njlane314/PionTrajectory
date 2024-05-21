@@ -1,5 +1,5 @@
 add_subdirectory(Interface)
-add_subdirectory(Modules)
+add_subdirectory(Module)
 add_subdirectory(Objects)
 
 art_make( 

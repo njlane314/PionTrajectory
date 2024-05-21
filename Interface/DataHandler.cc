@@ -1,6 +1,6 @@
-#include "Include/DataHandler.hh"
+#include "Include/DataHandler.h"
 //_________________________________________________________________________________________
-namespace ub_pion_trajectory {
+namespace ubpiontraj {
 //_________________________________________________________________________________________
 DataHandler* DataHandler::m_Instance = nullptr;
 //_________________________________________________________________________________________

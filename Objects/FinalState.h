@@ -1,12 +1,12 @@
-#ifndef FINALSTATE_HH
-#define FINALSTATE_HH
+#ifndef FINALSTATE_H
+#define FINALSTATE_H
 
 #include <vector>
 #include "TVector3.h"
-#include "art/Framework/Principal/Ptr.h"
-#include "simb/MCParticle.h"
 
-namespace ub_pion_traj 
+#include "nusimdata/SimulationBase/MCParticle.h"
+
+namespace ubpiontraj 
 {
    class FinalState {
    public:
@@ -95,4 +95,4 @@ namespace ub_pion_traj
    }
 } 
 
-#endif  // FINALSTATE_HH
+#endif  // FINALSTATE_H

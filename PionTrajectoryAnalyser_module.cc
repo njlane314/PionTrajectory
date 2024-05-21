@@ -1,12 +1,12 @@
 #include "PionTrajectoryAnalyser.h"
 //_________________________________________________________________________________________
-ub_pion_trajectory::PionTrajectoryAnalyser::PionTrajectoryAnalyser(fhicl::ParameterSet const& p)
+ubpiontraj::PionTrajectoryAnalyser::PionTrajectoryAnalyser(fhicl::ParameterSet const& p)
    : EDAnalyzer{p},
    m_config(ConfigManager::Initialise(p)) //,
    //m_dataHandler(std::make_unique<DataHandler>())
 {}
 //_________________________________________________________________________________________
-void ub_pion_trajectory::PionTrajectoryAnalyser::analyze(art::Event const& e)
+void ubpiontraj::PionTrajectoryAnalyser::analyze(art::Event const& e)
 {
    // The properties of the stopped pions can be used to enhance pion identification
    // Also, measuring "decay-kinks", and the Michel electrons
@@ -15,19 +15,19 @@ void ub_pion_trajectory::PionTrajectoryAnalyser::analyze(art::Event const& e)
    // Also, kinematic variables can be calculated to exclude unphysical kinematic combinations
 }
 //_________________________________________________________________________________________
-void ub_pion_trajectory::PionTrajectoryAnalyser::beginJob()
+void ubpiontraj::PionTrajectoryAnalyser::beginJob()
 {}
 //_________________________________________________________________________________________
-void ub_pion_trajectory::PionTrajectoryAnalyser::endJob()
+void ubpiontraj::PionTrajectoryAnalyser::endJob()
 {}
 //_________________________________________________________________________________________
-void ub_pion_trajectory::PionTrajectoryAnalyser::FinishEvent()
+void ubpiontraj::PionTrajectoryAnalyser::FinishEvent()
 {}	
 //_________________________________________________________________________________________
-void ub_pion_trajectory::PionTrajectoryAnalyser::beginSubRun(const art::SubRun& sr)
+void ubpiontraj::PionTrajectoryAnalyser::beginSubRun(const art::SubRun& sr)
 {}
 //_________________________________________________________________________________________
-void ub_pion_trajectory::PionTrajectoryAnalyser::endSubRun(const art::SubRun& sr)
+void ubpiontraj::PionTrajectoryAnalyser::endSubRun(const art::SubRun& sr)
 {}
 //_________________________________________________________________________________________
-DEFINE_ART_MODULE(ub_pion_trajectory::PionTrajectoryAnalyser)
+DEFINE_ART_MODULE(ubpiontraj::PionTrajectoryAnalyser)

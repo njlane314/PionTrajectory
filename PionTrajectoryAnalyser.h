@@ -23,14 +23,15 @@
 #include "TVector3.h"
 #include "TLorentzVector.h"
 
-#include "ubana/NeutralKaonProduction/Interface/include/ConfigManager.h"
+#include "Interface/Include/ConfigManager.h"
+#include "Interface/Include/DataHandler.h"
 
-namespace ub_pion_trajectory 
+namespace ubpiontraj 
 {
    class PionFinalStateAnalyser;
 }
 
-class ub_pion_trajectory::PionFinalStateAnalyser : public art::EDAnalyzer 
+class ubpiontraj::PionFinalStateAnalyser : public art::EDAnalyzer 
 {
    public:
 

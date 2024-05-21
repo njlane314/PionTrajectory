@@ -1,7 +1,20 @@
-#ifndef DATAHANDLER_HH
-#define DATAHANDLER_HH
+#ifndef DATAHANDLER_H
+#define DATAHANDLER_H
 
-namespace ub_pion_trajectory 
+#include <string>
+#include <vector>
+
+#include "TFile.h"
+#include "TTree.h"
+
+#include "art/Framework/Principal/Event.h"
+
+#include "nusimdata/SimulationBase/MCParticle.h"
+
+#include "ubana/PionTrajectory/Objects/Scatter.h"
+#include "ubana/PionTrajectory/Objects/FinalState.h"
+
+namespace ubpiontraj
 {
    class DataHandler 
    {
@@ -22,8 +35,13 @@ namespace ub_pion_trajectory
       static DataHandler* m_Instance;
 
       TFile* m_RootFile;
-      TTree* m_EventTree;
+
+      TTree* m_TrajTree;
+      TTree* m_ScatTree;
+
+      std::vector<std::vector<double>> traj_n, traj_x, traj_y, traj_z, traj_px, traj_py, traj_pz, traj_e;
+      std::vector<double> m_scat_elas, m_scat_inelas, m_scat_pfls, m_scat_thta; 
    };
 }
 
-#endif  // DATAHANDLER_HH
+#endif  // DATAHANDLER_H
