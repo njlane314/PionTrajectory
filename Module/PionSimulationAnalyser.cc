@@ -31,9 +31,9 @@ void PionSimulationAnalyser::AnalyseEvent(art::Event const& event)
          pionfound = true;
          m_Trajectories.push_back(initialParticle->Trajectory());
 
-         bool pionScattering = false;
+         bool pionscattering = true;
          art::Ptr<simb::MCParticle> particle = initialParticle; 
-         while(!pionScattering){  
+         while(pionscattering){  
             follow_scatter: 
 
             std::vector<art::Ptr<simb::MCParticle>> daughters = FindDaughters(particle);
@@ -58,6 +58,8 @@ void PionSimulationAnalyser::AnalyseEvent(art::Event const& event)
                   particle = daughter;
                   goto follow_scatter;
                }
+
+               pionsacttering = false;
             }
          }
 
