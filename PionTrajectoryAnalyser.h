@@ -58,6 +58,7 @@ class ubpiontraj::PionTrajectoryAnalyser : public art::EDAnalyzer
 
    private:
       std::string m_SimLabel;
+      bool m_Debug;
       
       TTree* m_TrajTree;
       TTree* m_ScatTree;

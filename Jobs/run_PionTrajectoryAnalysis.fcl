@@ -1,4 +1,4 @@
-#include "Configs/neutralKaonConfig.fcl"
+#include "Jobs/Configs/pionTrajConfig.fcl"
 #include "services_microboone.fcl"
 
 process_name: PionTrajectoryAnalysis
@@ -6,21 +6,33 @@ process_name: PionTrajectoryAnalysis
 source:
 {
         module_type: RootInput
-        @table::microboone_services
-        FileCatalogMetadata: @local::art_file_catalog_mc
+        fileNames:[ "/exp/uboone/app/users/nlane/NeutralKaonCode/srcs/ubana/ubana/PionTrajectory/Data/PhysicsRun-2016_7_29_22_26_32-0007003-01286_20160805T195522_ext_unbiased_20160806T215518_merged_20231124T135742_simmxd_detsim_mix_r1a_r1b_20231124T175_a4687571-abb8-4bf6-8fd9-38e59ea36114.root" ]  
 }
 
 services:
 {
         TFileService: { fileName: "piontraj_output.root" }
+        @table::microboone_services
+        FileCatalogMetadata: @local::art_file_catalog_mc
 }
 
 physics:
 {
         analyzers:
         {
-                ana: @local::
+                ana: @local::pion_trajectory_analysis
         }
-        path0: [ ana ] pion_trajectory_analysis
+        path0: [ ana ]
         end_paths: [ path0 ]
 }
+
+services.DetectorClocksService.InheritClockConfig: false
+services.DetectorClocksService.TriggerOffsetTPC: -400
+services.DetectorPropertiesService.NumberTimeSamples: 6400
+services.DetectorPropertiesService.ReadOutWindowSize: 6400
+services.SpaceCharge.EnableCalSpatialSCE: true #enable bkwd (reco -> true)
+services.SpaceCharge.EnableCalEfieldSCE: true
+services.SpaceCharge.EnableSimSpatialSCE: true # disable fwd (true -> reco)
+services.SpaceCharge.EnableSimEfieldSCE: true
+services.SpaceCharge.RepresentationType: "Voxelized_TH3"
+services.SpaceCharge.CalibrationInputFilename: "SpaceCharge/SCEoffsets_dataDriven_combined_bkwd_Jan18.root"

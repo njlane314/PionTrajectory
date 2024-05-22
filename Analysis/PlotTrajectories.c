@@ -12,7 +12,26 @@
 
 void PlotTrajectories(const char* filename, Long64_t entryNumber = 0, double offset = 50) {
     TFile* file = new TFile(filename);
-    TTree* tree = (TTree*)file->Get("TrajTree");  
+    if (!file || file->IsZombie()) {
+        std::cerr << "Error: Could not open file " << filename << std::endl;
+        return;
+    }
+
+    TDirectory* dir = (TDirectory*)file->Get("ana");
+    if (!dir) {
+        std::cerr << "Error: Could not find directory 'ana' in file " << filename << std::endl;
+        file->Close();
+        delete file;
+        return;
+    }
+
+    TTree* tree = (TTree*)dir->Get("TrajTree");
+    if (!tree) {
+        std::cerr << "Error: Could not find TTree 'TrajTree' in directory 'ana' in file " << filename << std::endl;
+        file->Close();
+        delete file;
+        return;
+    }
 
     std::vector<std::vector<double>> *traj_x = nullptr, *traj_y = nullptr, *traj_z = nullptr;
     tree->SetBranchAddress("traj_x", &traj_x);
@@ -23,8 +42,18 @@ void PlotTrajectories(const char* filename, Long64_t entryNumber = 0, double off
     double minY = 1e5, maxY = -1e5;
     double minZ = 1e5, maxZ = -1e5;
 
-    // Get the specific entry
     tree->GetEntry(entryNumber);
+    std::cout << "traj_x size: " << traj_x->size() << std::endl;
+    std::cout << "traj_y size: " << traj_y->size() << std::endl;
+    std::cout << "traj_z size: " << traj_z->size() << std::endl;
+
+    if (traj_x->empty() || traj_y->empty() || traj_z->empty()) {
+        std::cerr << "Error: traj_x, traj_y, or traj_z vector is empty for the specified entry." << std::endl;
+        file->Close();
+        delete file;
+        return;
+    }
+
     for (const auto& traj : *traj_x) {
         for (double x : traj) {
             if (x < minX) minX = x;
@@ -42,6 +71,25 @@ void PlotTrajectories(const char* filename, Long64_t entryNumber = 0, double off
             if (z < minZ) minZ = z;
             if (z > maxZ) maxZ = z;
         }
+    }
+
+    if (minX == 1e5 && maxX == -1e5) {
+        std::cerr << "Error: minX and maxX not updated. Exiting." << std::endl;
+        file->Close();
+        delete file;
+        return;
+    }
+    if (minY == 1e5 && maxY == -1e5) {
+        std::cerr << "Error: minY and maxY not updated. Exiting." << std::endl;
+        file->Close();
+        delete file;
+        return;
+    }
+    if (minZ == 1e5 && maxZ == -1e5) {
+        std::cerr << "Error: minZ and maxZ not updated. Exiting." << std::endl;
+        file->Close();
+        delete file;
+        return;
     }
 
     minX -= offset;

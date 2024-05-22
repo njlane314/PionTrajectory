@@ -2,7 +2,9 @@ BEGIN_PROLOG
 
 pion_trajectory_analysis:
 {
-        module_type: PionTrajectoryAnalysis
+        module_type: PionTrajectoryAnalyser
+        sim_label: "largeant"
+        debug: true
 }
 
 END_PROLOG
