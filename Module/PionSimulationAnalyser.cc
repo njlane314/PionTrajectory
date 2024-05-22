@@ -13,9 +13,6 @@ PionSimulationAnalyser::PionSimulationAnalyser(art::Event const& event, std::str
       m_SimParticleMap.insert(std::make_pair(particle->TrackId(), particle));
    }
 
-   m_Trajectories.clear();
-   m_Scatters.clear();
-   
    AnalyseEvent(event);
 }
 //_________________________________________________________________________________________

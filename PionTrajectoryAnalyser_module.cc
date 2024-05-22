@@ -118,16 +118,15 @@ void ubpiontraj::PionTrajectoryAnalyser::analyze(art::Event const& e)
       default:
          type = -1;
          break;
-    
-      m_fstt_typ = type;
-      m_fstt_nprd = finalstate.getProducts().size();
-
-      std::vector<int> prod_pdgs;
-      for (const auto& product : finalstate.getProducts()) {
-         m_fstt_prdpdg.push_back(product->PdgCode());
       }
-   }
+    
+   m_fstt_typ = type;
+   m_fstt_nprd = finalstate.getProducts().size();
 
+   std::vector<int> prod_pdgs;
+   for (const auto& product : finalstate.getProducts()) {
+      m_fstt_prdpdg.push_back(product->PdgCode());
+   }
 }
 //_________________________________________________________________________________________
 void ubpiontraj::PionTrajectoryAnalyser::FinishEvent()

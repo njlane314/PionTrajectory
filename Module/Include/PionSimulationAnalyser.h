@@ -32,13 +32,13 @@ namespace ubpiontraj
       PionSimulationAnalyser(art::Event const& event, std::string simlabel);
       ~PionSimulationAnalyser();
 
-      void AnalyseEvent(art::Event const& event);
-
       std::vector<simb::MCTrajectory> GetTrajectories() { return m_Trajectories; }
       std::vector<Scatter> GetScatters() { return m_Scatters; }
       FinalState GetFinalState() { return m_FinalState; }
 
    private:
+      void AnalyseEvent(art::Event const& event);
+      
       std::vector<simb::MCTrajectory> m_Trajectories;
       std::vector<Scatter> m_Scatters;
       FinalState m_FinalState;
