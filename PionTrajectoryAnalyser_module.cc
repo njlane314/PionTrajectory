@@ -118,7 +118,7 @@ void ubpiontraj::PionTrajectoryAnalyser::analyze(art::Event const& e)
       default:
          type = -1;
          break;
-      }
+   }
     
    m_fstt_typ = type;
    m_fstt_nprd = finalstate.getProducts().size();

@@ -1,0 +1,26 @@
+#include "Configs/neutralKaonConfig.fcl"
+#include "services_microboone.fcl"
+
+process_name: PionTrajectoryAnalysis
+
+source:
+{
+        module_type: RootInput
+        @table::microboone_services
+        FileCatalogMetadata: @local::art_file_catalog_mc
+}
+
+services:
+{
+        TFileService: { fileName: "piontraj_output.root" }
+}
+
+physics:
+{
+        analyzers:
+        {
+                ana: @local::
+        }
+        path0: [ ana ] pion_trajectory_analysis
+        end_paths: [ path0 ]
+}
