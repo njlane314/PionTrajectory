@@ -2,11 +2,10 @@
 //_________________________________________________________________________________________
 namespace ubpiontraj {
 //_________________________________________________________________________________________
-PionSimulationAnalyser::PionSimulationAnalyser(art::Event const& event)
+PionSimulationAnalyser::PionSimulationAnalyser(art::Event const& event, std::string simlabel) :
+   m_SimLabel(simlabel)
 {
-   m_ConfigManager = ConfigManager::GetInstance();
-
-   if(!event.getByLabel(m_ConfigManager->getSimulationLabel(), m_SimHandle));
+   if(!event.getByLabel(m_SimLabel, m_SimHandle));
 
    art::fill_ptr_vector(m_SimParticles, m_SimHandle);
 
@@ -14,15 +13,23 @@ PionSimulationAnalyser::PionSimulationAnalyser(art::Event const& event)
       m_SimParticleMap.insert(std::make_pair(particle->TrackId(), particle));
    }
 
+   m_Trajectories.clear();
+   m_Scatters.clear();
+   
    AnalyseEvent(event);
 }
+//_________________________________________________________________________________________
+PionSimulationAnalyser::~PionSimulationAnalyser() 
+{}
 //_________________________________________________________________________________________
 void PionSimulationAnalyser::AnalyseEvent(art::Event const& event)
 {  
    for(const art::Ptr<simb::MCParticle> &initialParticle : m_SimParticles){
+      bool pionfound = false;
+
       if(isChargedPion(initialParticle->PdgCode()) && initialParticle->Process() == "Primary"){
-         DataHandler::GetInstance()->Reset();
-         DataHandler::GetInstance()->AddTrajectory(initialParticle);
+         pionfound = true;
+         m_Trajectories.push_back(initialParticle->Trajectory());
 
          bool pionScattering = false;
          art::Ptr<simb::MCParticle> particle = initialParticle; 
@@ -35,18 +42,20 @@ void PionSimulationAnalyser::AnalyseEvent(art::Event const& event)
 
                if(daughter->Process() == "hadElastic"){
                   Scatter scatter(true, false, particle, daughter, daughters);
-                  DataHandler::GetInstance()->AddScatter(scatter);
+
+                  m_Scatters.push_back(scatter);
+                  m_Trajectories.push_back(particle->Trajectory());
 
                   particle = daughter; 
-                  DataHandler::GetInstance()->AddTrajectory(particle);
                   goto follow_scatter;
                }
                else if(daughter->Process() == "Inelastic"){
                   Scatter scatter(false, true, particle, daughter, daughters);
-                  DataHandler::GetInstance()->AddScatter(scatter);
+                  m_Scatters.push_back(scatter);
+
+                  m_Trajectories.push_back(particle->Trajectory());
 
                   particle = daughter;
-                  DataHandler::GetInstance()->AddTrajectory(particle);
                   goto follow_scatter;
                }
             }
@@ -61,9 +70,10 @@ void PionSimulationAnalyser::AnalyseEvent(art::Event const& event)
          }
 
          FinalState finalState(particle, products);
-         DataHandler::GetInstance()->AddFinalState(finalState);
-         DataHandler::GetInstance()->AddEntry(); 
+         m_FinalState = finalState;
       }
+
+      if(pionfound) break; 
    }
 }
 //_________________________________________________________________________________________

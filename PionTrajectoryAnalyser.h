@@ -21,13 +21,14 @@
 #include "larcoreobj/SummaryData/POTSummary.h"
 #include "lardataobj/RecoBase/Wire.h"
 #include "larsim/EventWeight/Base/MCEventWeight.h"
+#include "nusimdata/SimulationBase/MCTrajectory.h"
 
 #include "TTree.h"
 #include "TVector3.h"
 #include "TLorentzVector.h"
 
-#include "Interface/Include/ConfigManager.h"
-#include "Interface/Include/DataHandler.h"
+#include "Objects/FinalState.h"
+#include "Objects/Scatter.h"
 #include "Module/Include/PionSimulationAnalyser.h"
 
 namespace ubpiontraj 
@@ -38,7 +39,6 @@ namespace ubpiontraj
 class ubpiontraj::PionTrajectoryAnalyser : public art::EDAnalyzer 
 {
    public:
-
       explicit PionTrajectoryAnalyser(fhicl::ParameterSet const& p);
 
       PionTrajectoryAnalyser(PionTrajectoryAnalyser const&) = delete;
@@ -57,9 +57,17 @@ class ubpiontraj::PionTrajectoryAnalyser : public art::EDAnalyzer
       void endSubRun(const art::SubRun& sr);
 
    private:
+      std::string m_SimLabel;
+      
+      TTree* m_TrajTree;
+      TTree* m_ScatTree;
+      TTree* m_FinSttTree;
 
-      ConfigManager* m_config;
-      DataHandler* m_dataHandler; 
+      std::vector<int> m_traj_n;
+      std::vector<std::vector<double>> m_traj_x, m_traj_y, m_traj_z, m_traj_px, m_traj_py, m_traj_pz, m_traj_e;
+      std::vector<double> m_scat_elas, m_scat_inelas, m_scat_pfls, m_scat_thta; 
+      int m_fstt_nprd, m_fstt_typ;
+      std::vector<int> m_fstt_prdpdg;
 };
 
 #endif // PIONTRAJECTORYANALYSER_H

@@ -39,8 +39,6 @@ art_make(
             ${ROOT_XMLIO}
             ${ROOT_GDML}
             ${ROOT_BASIC_LIB_LIST}
-
-            ubpiontraj_Interface
 )
 
 install_headers()

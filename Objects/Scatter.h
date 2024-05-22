@@ -8,6 +8,13 @@
 
 #include "ubana/PionTrajectory/Interface/Include/ParticleTypes.h"
 
+#include "art/Framework/Core/EDAnalyzer.h"
+#include "art/Framework/Core/ModuleMacros.h"
+#include "art/Framework/Principal/Event.h"
+#include "art/Framework/Principal/Handle.h"
+#include "art/Framework/Principal/Run.h"
+#include "art/Framework/Principal/SubRun.h"
+
 namespace ubpiontraj
 {
    class Scatter {
@@ -72,7 +79,7 @@ namespace ubpiontraj
 
    double Scatter::MomentumFractionLoss() const {
       double initialMagnitude = m_incidentParticle->EndMomentum().Mag();
-      double finalMagnitude = m_scatterParticle->EndMomentum().Mag();
+      double finalMagnitude = m_scatterParticle->Momentum().Mag();
 
       if (initialMagnitude == 0) {
          return 0;
@@ -82,10 +89,10 @@ namespace ubpiontraj
    }
 
    double Scatter::CosTheta() const {
-      double dotProduct = m_incidentParticle->EndMomentum().Dot(m_scatterParticle->EndMomentum());
+      double dotProduct = m_incidentParticle->EndMomentum().Dot(m_scatterParticle->Momentum());
 
       double initialMagnitude = m_incidentParticle->EndMomentum().Mag();
-      double finalMagnitude = m_scatterParticle->EndMomentum().Mag();
+      double finalMagnitude = m_scatterParticle->Momentum().Mag();
 
       if (initialMagnitude == 0 || finalMagnitude == 0) {
          return 0;

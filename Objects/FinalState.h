@@ -8,10 +8,18 @@
 
 #include "ubana/PionTrajectory/Interface/Include/ParticleTypes.h"
 
+#include "art/Framework/Core/EDAnalyzer.h"
+#include "art/Framework/Core/ModuleMacros.h"
+#include "art/Framework/Principal/Event.h"
+#include "art/Framework/Principal/Handle.h"
+#include "art/Framework/Principal/Run.h"
+#include "art/Framework/Principal/SubRun.h"
+
 namespace ubpiontraj 
 {
    class FinalState {
    public:
+      FinalState();
       FinalState(const art::Ptr<simb::MCParticle>& mother, const std::vector<art::Ptr<simb::MCParticle>>& products);
 
       ~FinalState();
@@ -34,6 +42,9 @@ namespace ubpiontraj
       art::Ptr<simb::MCParticle> m_mother;
       std::vector<art::Ptr<simb::MCParticle>> m_products;
    };
+
+   FinalState::FinalState()
+    : m_type(Type::None), m_mother(), m_products() {}
 
    FinalState::FinalState(const art::Ptr<simb:: MCParticle>& mother, const std::vector<art::Ptr<simb::MCParticle>>& products)
       : m_type(Type::Other), m_mother(mother), m_products(products) {
@@ -80,10 +91,6 @@ namespace ubpiontraj
    void FinalState::print() const {
       std::cout << "Interaction Type: " << m_type << "\n"
                 << "Number of Products: " << m_products.size() << "\n";
-
-      for (const auto& product : m_products) {
-         std::cout << "Product ID: " << product->TrackId() << "\n";
-      }
    }
 } 
 

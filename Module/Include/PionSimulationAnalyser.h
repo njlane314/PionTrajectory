@@ -4,8 +4,6 @@
 #include <string>
 #include <vector>
 
-#include "ubana/PionTrajectory/Interface/Include/DataHandler.h"
-#include "ubana/PionTrajectory/Interface/Include/ConfigManager.h"
 #include "ubana/PionTrajectory/Interface/Include/ParticleTypes.h"
 #include "ubana/PionTrajectory/Objects/FinalState.h"
 #include "ubana/PionTrajectory/Objects/Scatter.h"
@@ -24,23 +22,31 @@
 #include "canvas/Persistency/Common/FindManyP.h"
 #include "canvas/Persistency/Common/FindMany.h"		
 #include "nusimdata/SimulationBase/MCParticle.h"
+#include "nusimdata/SimulationBase/MCTrajectory.h"
 
 namespace ubpiontraj 
 {
    class PionSimulationAnalyser 
    {
    public:
-      PionSimulationAnalyser(art::Event const& event);
+      PionSimulationAnalyser(art::Event const& event, std::string simlabel);
       ~PionSimulationAnalyser();
 
       void AnalyseEvent(art::Event const& event);
 
+      std::vector<simb::MCTrajectory> GetTrajectories() { return m_Trajectories; }
+      std::vector<Scatter> GetScatters() { return m_Scatters; }
+      FinalState GetFinalState() { return m_FinalState; }
+
    private:
-      ConfigManager* m_ConfigManager; 
+      std::vector<simb::MCTrajectory> m_Trajectories;
+      std::vector<Scatter> m_Scatters;
+      FinalState m_FinalState;
 
       art::Handle<std::vector<simb::MCParticle>> m_SimHandle;
-      std::vector<art::Ptr<simb::MCParticle>> m_SimParticles;
+      std::string m_SimLabel;
 
+      std::vector<art::Ptr<simb::MCParticle>> m_SimParticles;
       std::map<int, art::Ptr<simb::MCParticle>> m_SimParticleMap;
 
       std::vector<art::Ptr<simb::MCParticle>> FindDaughters(const art::Ptr<simb::MCParticle> particle);

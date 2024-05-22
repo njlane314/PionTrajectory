@@ -1,6 +1,4 @@
 art_make(
-    
-    LIBRARY_NAME    ubpiontraj_Interface
 
     LIB_LIBRARIES
         larcorealg_Geometry

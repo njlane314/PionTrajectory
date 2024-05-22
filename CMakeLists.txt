@@ -49,7 +49,6 @@ art_make(
 			${ROOT_BASIC_LIB_LIST}
 			${ROOT_GENVECTOR}
 
-			ubpiontraj_Interface 
 			ubpiontraj_Module
 )
 
