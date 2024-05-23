@@ -192,10 +192,10 @@ void PrintScatteringAngles(const char* filename, Long64_t entryNumber = 0) {
     delete hScatteringAngles;
 
     TCanvas* c2 = new TCanvas("c2", "", 800, 600);
-    hScat->Draw("COLZ"); // Using COLZ to provide a better color map representation
-    hScat->SetMarkerStyle(2); // Set the marker style to 'x'
-    hScat->SetMarkerColor(kBlue); // Set the marker color to red
-    hScat->Draw("P"); // Draw the scatter plot with the specified marker style
+    hScat->Draw("COLZ"); 
+    hScat->SetMarkerStyle(2);
+    hScat->SetMarkerColor(kBlue); 
+    hScat->Draw("P"); 
     c2->SaveAs("Plots/plot_scattering_plane_angles.png");
     delete c2;
     delete hScat;
