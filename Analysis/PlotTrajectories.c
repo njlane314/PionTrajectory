@@ -99,11 +99,11 @@ void PlotTrajectories(const char* filename, Long64_t entryNumber = 0, double off
     minZ -= offset;
     maxZ += offset;
 
-    int nBins = 500;
-    TH2F* histXZ = new TH2F("histXZ", "x vs z; z [mm]; x [mm]", 
+    int nBins = 100;
+    TH2F* histXZ = new TH2F("histXZ", "x vs z; z [cm]; x [cm]", 
                             nBins, minZ, maxZ,  
                             nBins, minX, maxX); 
-    TH2F* histXY = new TH2F("histXY", "x vs y; y [mm]; x [mm]", 
+    TH2F* histXY = new TH2F("histXY", "x vs y; y [cm]; x [cm]", 
                             nBins, minY, maxY,  
                             nBins, minX, maxX); 
 
@@ -122,15 +122,15 @@ void PlotTrajectories(const char* filename, Long64_t entryNumber = 0, double off
 
     TCanvas* c1 = new TCanvas("c1", "", 800, 600);
     histXZ->Draw("colz");
-    c1->SaveAs("plots/plot_x_vs_z.png");
+    c1->SaveAs("Plots/plot_x_vs_z.png");
     
     TCanvas* c2 = new TCanvas("c2", "", 800, 600);
     histXY->Draw("colz");
-    c2->SaveAs("plots/plot_x_vs_y.png");
+    c2->SaveAs("Plots/plot_x_vs_y.png");
 
-    TCanvas* c3 = new TCanvas("c3", "", 1000, 1000);
+    TCanvas* c3 = new TCanvas("c3", "", 2000, 2000);
     histXYZ->Draw("BOX2");
-    c3->SaveAs("plots/plot_x_vs_y_vs_z.png");
+    c3->SaveAs("Plots/plot_x_vs_y_vs_z.png");
     
     delete c1;
     delete c2;

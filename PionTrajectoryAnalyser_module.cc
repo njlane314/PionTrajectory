@@ -46,7 +46,8 @@ void ubpiontraj::PionTrajectoryAnalyser::endJob()
 void ubpiontraj::PionTrajectoryAnalyser::analyze(art::Event const& e)
 {
    if (m_Debug) {
-       std::cout << ">>> [PionTrajectoryAnalyser] Analyzing event: " << e.id() << std::endl;
+      std::cout << "///----------------------------------------" << std::endl;
+      std::cout << ">>> [PionTrajectoryAnalyser] Analyzing event: " << e.id() << std::endl;
    }
 
    PionSimulationAnalyser* piSimAna = new PionSimulationAnalyser(e, m_SimLabel, m_Debug);
@@ -107,6 +108,10 @@ void ubpiontraj::PionTrajectoryAnalyser::analyze(art::Event const& e)
       }
    }
 
+   if (m_Debug) {
+      std::cout << ">>> [PionTrajectoryAnalyser] Filling scatterings of size " << scatters.size() << std::endl;
+   }
+
    for (Scatter scat : scatters) {
       m_scat_elas.push_back(scat.isElastic());
       m_scat_inelas.push_back(scat.isInelastic());
@@ -149,24 +154,23 @@ void ubpiontraj::PionTrajectoryAnalyser::analyze(art::Event const& e)
    std::vector<int> prod_pdgs;
    for (const auto& product : finalstate.getProducts()) {
       m_fstt_prdpdg.push_back(product->PdgCode());
-      if (m_Debug) {
-          std::cout << ">>> [PionTrajectoryAnalyser] Final state product PDG: " << product->PdgCode() << std::endl;
-      }
    }
    
    if (m_Debug) {
        std::cout << ">>> [PionTrajectoryAnalyser] Final state type: " << type << ", Number of products: " << m_fstt_nprd << std::endl;
    }
-}
-//_________________________________________________________________________________________
-void ubpiontraj::PionTrajectoryAnalyser::FinishEvent()
-{
+
    if (m_Debug) {
-       std::cout << ">>> [PionTrajectoryAnalyser] Filling trees for the event." << std::endl;
+       std::cout << ">>> [PionTrajectoryAnalyser] Filling trees for the event..." << std::endl;
    }
+
    m_TrajTree->Fill();
    m_ScatTree->Fill();
    m_FinSttTree->Fill();
+
+   if (m_Debug) {
+       std::cout << ">>> [PionTrajectoryAnalyser] Trees filled!" << std::endl;
+   }
 }
 //_________________________________________________________________________________________
 void ubpiontraj::PionTrajectoryAnalyser::beginSubRun(const art::SubRun& sr)

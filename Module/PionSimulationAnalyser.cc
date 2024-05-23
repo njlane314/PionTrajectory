@@ -20,12 +20,12 @@ PionSimulationAnalyser::PionSimulationAnalyser(art::Event const& event, std::str
 
    art::fill_ptr_vector(m_SimParticles, m_SimHandle);
 
-   for (const art::Ptr<simb::MCParticle>& particle : m_SimParticles) {
-      m_SimParticleMap.insert(std::make_pair(particle->TrackId(), particle));
+   for (const art::Ptr<simb::MCParticle>& initialPion : m_SimParticles) {
+      m_SimParticleMap.insert(std::make_pair(initialPion->TrackId(), initialPion));
    }
 
    if (m_Debug) {
-       std::cout << ">>> [PionSimulationAnalyser] Simulation particles and particle map initialized. Total particles: " << m_SimParticles.size() << std::endl;
+       std::cout << ">>> [PionSimulationAnalyser] Simulation particles and initialPion map initialized. Total particles: " << m_SimParticles.size() << std::endl;
    }
 }
 //_________________________________________________________________________________________
@@ -35,15 +35,14 @@ PionSimulationAnalyser::~PionSimulationAnalyser()
 void PionSimulationAnalyser::AnalyseEvent(art::Event const& event)
 {  
    if (m_Debug) {
-       std::cout << "///----------------------------------------" << std::endl;
-       std::cout << ">>> [PionSimulationAnalyser] Analyzing event: " << event.id() << std::endl;
+       std::cout << ">>> [PionSimulationAnalyser] Analyzing event... " << std::endl;
    }
 
    std::vector<art::Ptr<simb::MCParticle>> pionParticles;
 
-   for (const art::Ptr<simb::MCParticle>& particle : m_SimParticles) {
-      if (isChargedPion(particle->PdgCode()) && particle->Mother() != 0) {
-         pionParticles.push_back(particle);
+   for (const art::Ptr<simb::MCParticle>& initialPion : m_SimParticles) {
+      if (isChargedPion(initialPion->PdgCode()) && initialPion->Process() == "primary") {
+         pionParticles.push_back(initialPion);
       }
    }
 
@@ -52,12 +51,11 @@ void PionSimulationAnalyser::AnalyseEvent(art::Event const& event)
    }
 
    if(pionParticles.size() == 0) {
-      std::cout << ">>> [PionSimulationAnalyser] Exiting AnalyseEvent function." << std::endl;
-      std::cout << "///----------------------------------------" << std::endl;
+      std::cout << ">>> [PionSimulationAnalyser] Exiting AnalyseEvent function..." << std::endl;
       return;
    }
 
-   const art::Ptr<simb::MCParticle>& initialPion = pionParticles.front();  // Get the first primary pion
+   const art::Ptr<simb::MCParticle>& initialPion = pionParticles.front();  
    m_Trajectories.push_back(initialPion->Trajectory());
 
    if (m_Debug) {
@@ -66,9 +64,9 @@ void PionSimulationAnalyser::AnalyseEvent(art::Event const& event)
 
    art::Ptr<simb::MCParticle> particle = initialPion; 
    bool pionscattering = true;
+   
    while (pionscattering) {  
       std::vector<art::Ptr<simb::MCParticle>> daughters = FindDaughters(particle);
-      bool scatterFound = false;
 
       for (const auto& daughter : daughters) {
          if (!isChargedPion(daughter->PdgCode())) continue;
@@ -84,7 +82,6 @@ void PionSimulationAnalyser::AnalyseEvent(art::Event const& event)
             }
 
             particle = daughter; 
-            scatterFound = true;
             break;
          }
          else if (daughter->Process() == "Inelastic") {
@@ -98,29 +95,23 @@ void PionSimulationAnalyser::AnalyseEvent(art::Event const& event)
             }
 
             particle = daughter;
-            scatterFound = true;
             break;
          }
       }
 
-      if (!scatterFound) {
-         pionscattering = false;
-      }
+      pionscattering = false;
    }
 
    std::vector<art::Ptr<simb::MCParticle>> products;
-   for (const auto finalParticle : FindDaughters(particle)) {
-      if ((finalParticle->PdgCode() == 11 && finalParticle->Process() == "hIoni") || finalParticle->Process() == "hadElastic")
+   for (const auto finalParticle : FindDaughters(initialPion)) {
+      if ((finalParticle->PdgCode() == 11 && finalParticle->Process() == "hIoni") || finalParticle->Process() == "hadElastic" 
+      || finalParticle->PdgCode() > 10000  || finalParticle->PdgCode() == 22)
             continue;
       
       products.push_back(finalParticle); 
-
-      if (m_Debug) {
-            std::cout << ">>> [PionSimulationAnalyser] Final state product added with PDG code: " << finalParticle->PdgCode() << std::endl;
-      }
    }
 
-   FinalState finalState(particle, products);
+   FinalState finalState(initialPion, products);
    m_FinalState = finalState;
 
    if (m_Debug) {
@@ -129,22 +120,21 @@ void PionSimulationAnalyser::AnalyseEvent(art::Event const& event)
          
    if (m_Debug) {
        std::cout << ">>> [PionSimulationAnalyser] Event analysis complete." << std::endl;
-       std::cout << "///----------------------------------------" << std::endl;
    }
 }
 //_________________________________________________________________________________________
-std::vector<art::Ptr<simb::MCParticle>> PionSimulationAnalyser::FindDaughters(const art::Ptr<simb::MCParticle> particle)
+std::vector<art::Ptr<simb::MCParticle>> PionSimulationAnalyser::FindDaughters(const art::Ptr<simb::MCParticle> initialPion)
 {
    std::vector<art::Ptr<simb::MCParticle>> daughters;
 
-   for (int i = 0; i < particle->NumberDaughters(); i++) {
-      if (m_SimParticleMap.find(particle->Daughter(i)) == m_SimParticleMap.end()) continue;
+   for (int i = 0; i < initialPion->NumberDaughters(); i++) {
+      if (m_SimParticleMap.find(initialPion->Daughter(i)) == m_SimParticleMap.end()) continue;
 
-      daughters.push_back(m_SimParticleMap[particle->Daughter(i)]);
+      daughters.push_back(m_SimParticleMap[initialPion->Daughter(i)]);
    }
 
    if (m_Debug) {
-       std::cout << ">>> [PionSimulationAnalyser] Found " << daughters.size() << " daughters for particle with TrackId: " << particle->TrackId() << std::endl;
+       std::cout << ">>> [PionSimulationAnalyser] Found " << daughters.size() << " daughters for initialPion with TrackId: " << initialPion->TrackId() << std::endl;
    }
 
    return daughters;

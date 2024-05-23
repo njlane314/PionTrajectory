@@ -51,8 +51,6 @@ class ubpiontraj::PionTrajectoryAnalyser : public art::EDAnalyzer
       void beginJob() override;
       void endJob() override;
 
-      void FinishEvent();
-
       void beginSubRun(const art::SubRun& sr);
       void endSubRun(const art::SubRun& sr);
 
