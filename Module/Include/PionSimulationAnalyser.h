@@ -7,6 +7,7 @@
 #include "ubana/PionTrajectory/Interface/Include/ParticleTypes.h"
 #include "ubana/PionTrajectory/Objects/FinalState.h"
 #include "ubana/PionTrajectory/Objects/Scatter.h"
+#include "ubana/PionTrajectory/Objects/Trajectory.h"
 
 #include "art/Framework/Core/EDAnalyzer.h"
 #include "art/Framework/Core/ModuleMacros.h"
@@ -34,16 +35,10 @@ namespace ubpiontraj
 
       void AnalyseEvent(art::Event const& event);
 
-      std::vector<simb::MCTrajectory> GetTrajectories() { return m_Trajectories; }
-      std::vector<Scatter> GetScatters() { return m_Scatters; }
+      Trajectory GetTrajectory() { return m_Trajectory; }
       FinalState GetFinalState() { return m_FinalState; }
 
    private:
-      
-      std::vector<simb::MCTrajectory> m_Trajectories;
-      std::vector<Scatter> m_Scatters;
-      FinalState m_FinalState;
-
       art::Handle<std::vector<simb::MCParticle>> m_SimHandle;
       std::string m_SimLabel;
       bool m_Debug;
@@ -51,7 +46,12 @@ namespace ubpiontraj
       std::vector<art::Ptr<simb::MCParticle>> m_SimParticles;
       std::map<int, art::Ptr<simb::MCParticle>> m_SimParticleMap;
 
+      Trajectory m_Trajectory;
+      FinalState m_FinalState;
+
       std::vector<art::Ptr<simb::MCParticle>> FindDaughters(const art::Ptr<simb::MCParticle> particle);
+      void FollowScatters(art::Ptr<simb::MCParticle> particle, art::Ptr<simb::MCParticle> scatteredparticle);
+      void AddTrajectory(const simb::MCTrajectory traj);
    };
 }
 

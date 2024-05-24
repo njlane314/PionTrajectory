@@ -33,7 +33,10 @@ void PlotTrajectories(const char* filename, Long64_t entryNumber = 0, double off
         return;
     }
 
-    std::vector<std::vector<double>> *traj_x = nullptr, *traj_y = nullptr, *traj_z = nullptr;
+    int traj_n;
+    tree->SetBranchAddress("traj_n", &traj_n);
+
+    std::vector<double> *traj_x = nullptr, *traj_y = nullptr, *traj_z = nullptr;
     tree->SetBranchAddress("traj_x", &traj_x);
     tree->SetBranchAddress("traj_y", &traj_y);
     tree->SetBranchAddress("traj_z", &traj_z);
@@ -43,6 +46,7 @@ void PlotTrajectories(const char* filename, Long64_t entryNumber = 0, double off
     double minZ = 1e5, maxZ = -1e5;
 
     tree->GetEntry(entryNumber);
+    std::cout << traj_n << std::endl;
     std::cout << "traj_x size: " << traj_x->size() << std::endl;
     std::cout << "traj_y size: " << traj_y->size() << std::endl;
     std::cout << "traj_z size: " << traj_z->size() << std::endl;
@@ -54,23 +58,19 @@ void PlotTrajectories(const char* filename, Long64_t entryNumber = 0, double off
         return;
     }
 
-    for (const auto& traj : *traj_x) {
-        for (double x : traj) {
-            if (x < minX) minX = x;
-            if (x > maxX) maxX = x;
-        }
+    for (double x : *traj_x) {
+        if (x < minX) minX = x;
+        if (x > maxX) maxX = x;
     }
-    for (const auto& traj : *traj_y) {
-        for (double y : traj) {
-            if (y < minY) minY = y;
-            if (y > maxY) maxY = y;
-        }
+
+    for (double y : *traj_y) {
+        if (y < minY) minY = y;
+        if (y > maxY) maxY = y;
     }
-    for (const auto& traj : *traj_z) {
-        for (double z : traj) {
-            if (z < minZ) minZ = z;
-            if (z > maxZ) maxZ = z;
-        }
+    
+    for (double z : *traj_z) {
+        if (z < minZ) minZ = z;
+        if (z > maxZ) maxZ = z;
     }
 
     if (minX == 1e5 && maxX == -1e5) {
@@ -112,12 +112,10 @@ void PlotTrajectories(const char* filename, Long64_t entryNumber = 0, double off
                              nBins, minY, maxY, 
                              nBins, minZ, maxZ);
     
-    for (size_t traj_id = 0; traj_id < traj_x->size(); traj_id++) {
-        for (size_t pnt_id = 0; pnt_id < (*traj_x)[traj_id].size(); pnt_id++) {
-            histXZ->Fill((*traj_z)[traj_id][pnt_id], (*traj_x)[traj_id][pnt_id]);
-            histXY->Fill((*traj_y)[traj_id][pnt_id], (*traj_x)[traj_id][pnt_id]);
-            histXYZ->Fill((*traj_x)[traj_id][pnt_id], (*traj_y)[traj_id][pnt_id], (*traj_z)[traj_id][pnt_id]);
-        }
+    for (size_t pnt_id = 0; pnt_id < traj_x->size(); pnt_id++) {
+        histXZ->Fill((*traj_z)[pnt_id], (*traj_x)[pnt_id]);
+        histXY->Fill((*traj_y)[pnt_id], (*traj_x)[pnt_id]);
+        histXYZ->Fill((*traj_x)[pnt_id], (*traj_y)[pnt_id], (*traj_z)[pnt_id]);
     }
 
     TCanvas* c1 = new TCanvas("c1", "", 800, 600);

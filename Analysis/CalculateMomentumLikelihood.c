@@ -170,7 +170,7 @@ void CalculateMomentumLikelihood(const char* filename, int entrynumber) {
 
             double bestP = 0.0;
             double minNLL = std::numeric_limits<double>::max();
-            for (double p = 0.01; p <= 1; p += 0.01) {
+            for (double p = 0.01; p <= 2; p += 0.01) {
                 double nll = NegativeLogLikelihood(XZScatteringAngles, YZScatteringAngles, segmentLengths, p);
                 momenta.push_back(p);
                 nllValues.push_back(nll);
@@ -215,7 +215,7 @@ void CalculateMomentumLikelihood(const char* filename, int entrynumber) {
     mg->Draw("AL");
     mg->GetXaxis()->SetTitle("Pion Momentum (GeV/c)");
     mg->GetYaxis()->SetTitle("Negative Log Likelihood");
-    mg->GetXaxis()->SetRangeUser(0.1, 0.8);
+    mg->GetXaxis()->SetRangeUser(0.1, 1.5);
 
     auto minElementIter = std::min_element(globalNLLValues.begin(), globalNLLValues.end());
     double minMomentum = 0.01 + 0.01 * std::distance(globalNLLValues.begin(), minElementIter);
@@ -225,7 +225,7 @@ void CalculateMomentumLikelihood(const char* filename, int entrynumber) {
     minLine->SetLineStyle(7); 
     minLine->Draw();
 
-    TLine* line = new TLine(0.2, mg->GetYaxis()->GetXmin(), 0.2, mg->GetYaxis()->GetXmax());
+    TLine* line = new TLine(1, mg->GetYaxis()->GetXmin(), 1, mg->GetYaxis()->GetXmax());
     line->SetLineColor(kBlue);
     line->SetLineStyle(7); 
     line->Draw();
