@@ -1,5 +1,7 @@
 art_make( 
 
+      LIBRARY_NAME     ubpiontraj_Objects
+
       LIB_LIBRARIES
             larcorealg_Geometry
             ubana_ParticleID_Algorithms
@@ -37,8 +39,7 @@ art_make(
             ${ROOT_XMLIO}
             ${ROOT_GDML}
             ${ROOT_BASIC_LIB_LIST}
-
-      )
+)
 
 install_headers()
 install_fhicl()

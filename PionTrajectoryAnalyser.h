@@ -27,10 +27,9 @@
 #include "TVector3.h"
 #include "TLorentzVector.h"
 
-#include "Objects/FinalState.h"
-#include "Objects/Scatter.h"
-#include "Objects/Trajectory.h"
+#include "Objects/Include/Trajectory.h"
 #include "Module/Include/PionSimulationAnalyser.h"
+#include "Module/Include/PionReconstructionAnalyser.h"
 
 namespace ubpiontraj 
 {
@@ -57,6 +56,10 @@ class ubpiontraj::PionTrajectoryAnalyser : public art::EDAnalyzer
 
    private:
       std::string m_SimLabel;
+      std::string m_RecoTrackLabel;
+      std::string m_RecoTrackHitLabel;
+      std::string m_RecoHitSimParticleLabel;
+      std::string m_RecoCaloLabel;
       bool m_Debug;
       
       TTree* m_TrajTree;

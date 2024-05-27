@@ -4,6 +4,10 @@ pion_trajectory_analysis:
 {
         module_type: PionTrajectoryAnalyser
         sim_label: "largeant"
+        reco_label: "pandora"
+        reco_trackhit_label: "pandora"
+        reco_hitsimparticle_label: "gaushitTruthMatch"
+        reco_calo_label: "pandoracali"
         debug: true
 }
 

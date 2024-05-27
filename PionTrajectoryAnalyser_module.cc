@@ -3,6 +3,10 @@
 ubpiontraj::PionTrajectoryAnalyser::PionTrajectoryAnalyser(fhicl::ParameterSet const& p) : 
    EDAnalyzer{p},
    m_SimLabel(p.get<std::string>("sim_label", "largeant")),
+   m_RecoTrackLabel(p.get<std::string>("reco_label", "pandora")),
+   m_RecoTrackHitLabel(p.get<std::string>("reco_trackhit_label", "pandora")),
+   m_RecoHitSimParticleLabel(p.get<std::string>("reco_hitsimparticle_label", "gaushitTruthMatch")),
+   m_RecoCaloLabel(p.get<std::string>("reco_calo_label", "pandoracali")),
    m_Debug(p.get<bool>("debug", false))
 {}
 //_________________________________________________________________________________________
@@ -44,6 +48,7 @@ void ubpiontraj::PionTrajectoryAnalyser::analyze(art::Event const& e)
    piSimAna->AnalyseEvent(e);
 
    ubpiontraj::Trajectory trajectory = piSimAna->GetTrajectory();
+   PionReconstructionAnalyser* piRecoAna = new PionReconstructionAnalyser(e, trajectory, m_RecoTrackLabel, m_RecoTrackHitLabel, m_RecoHitSimParticleLabel, m_RecoCaloLabel, m_Debug);
 
    m_traj_n = 0;
    m_traj_x.clear();
@@ -88,6 +93,7 @@ void ubpiontraj::PionTrajectoryAnalyser::analyze(art::Event const& e)
    }
 
    delete piSimAna;
+   delete piRecoAna;
 }
 //_________________________________________________________________________________________
 void ubpiontraj::PionTrajectoryAnalyser::beginSubRun(const art::SubRun& sr)

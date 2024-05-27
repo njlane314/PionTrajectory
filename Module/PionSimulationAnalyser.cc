@@ -59,8 +59,9 @@ void PionSimulationAnalyser::AnalyseEvent(art::Event const& event)
 //_________________________________________________________________________________________
 void PionSimulationAnalyser::FollowScatters(art::Ptr<simb::MCParticle> particle, art::Ptr<simb::MCParticle> scatteredparticle)
 {
+   m_Trajectory.AddSimParticle(particle);
    const simb::MCTrajectory traj = particle->Trajectory();
-   AddTrajectory(traj); 
+   AnalyseTrajectory(traj); 
 
    scatteredparticle = particle;
 
@@ -81,7 +82,7 @@ void PionSimulationAnalyser::FollowScatters(art::Ptr<simb::MCParticle> particle,
    FollowScatters(finalparticle, scatteredparticle);
 }
 //_________________________________________________________________________________________
-void ubpiontraj::PionSimulationAnalyser::AddTrajectory(const simb::MCTrajectory traj)
+void ubpiontraj::PionSimulationAnalyser::AnalyseTrajectory(const simb::MCTrajectory traj)
 {
    for (size_t i = 0; i < traj.size(); ++i) {
       m_Trajectory.AddPoint(traj.Position(i), traj.Momentum(i), "");

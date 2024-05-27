@@ -5,9 +5,7 @@
 #include <vector>
 
 #include "ubana/PionTrajectory/Interface/Include/ParticleTypes.h"
-#include "ubana/PionTrajectory/Objects/FinalState.h"
-#include "ubana/PionTrajectory/Objects/Scatter.h"
-#include "ubana/PionTrajectory/Objects/Trajectory.h"
+#include "ubana/PionTrajectory/Objects/Include/Trajectory.h"
 
 #include "art/Framework/Core/EDAnalyzer.h"
 #include "art/Framework/Core/ModuleMacros.h"
@@ -35,8 +33,7 @@ namespace ubpiontraj
 
       void AnalyseEvent(art::Event const& event);
 
-      Trajectory GetTrajectory() { return m_Trajectory; }
-      FinalState GetFinalState() { return m_FinalState; }
+      Trajectory GetTrajectory() {return m_Trajectory;}
 
    private:
       art::Handle<std::vector<simb::MCParticle>> m_SimHandle;
@@ -47,11 +44,10 @@ namespace ubpiontraj
       std::map<int, art::Ptr<simb::MCParticle>> m_SimParticleMap;
 
       Trajectory m_Trajectory;
-      FinalState m_FinalState;
 
       std::vector<art::Ptr<simb::MCParticle>> FindDaughters(const art::Ptr<simb::MCParticle> particle);
       void FollowScatters(art::Ptr<simb::MCParticle> particle, art::Ptr<simb::MCParticle> scatteredparticle);
-      void AddTrajectory(const simb::MCTrajectory traj);
+      void AnalyseTrajectory(const simb::MCTrajectory traj);
    };
 }
 

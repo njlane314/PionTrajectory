@@ -50,6 +50,7 @@ art_make(
 			${ROOT_GENVECTOR}
 
 			ubpiontraj_Module
+			ubpiontraj_Objects
 )
 
 install_headers()
