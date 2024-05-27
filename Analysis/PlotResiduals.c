@@ -1,3 +1,5 @@
+//root -l -b -q 'PlotResiduals.c("Output/pi_plus_1.0GeV_ana.root")'
+
 #include "TFile.h"
 #include "TTree.h"
 #include "TCanvas.h"
@@ -5,6 +7,11 @@
 #include <vector>
 #include <cmath>
 #include <iostream>
+#include <algorithm>
+
+const double PI = 3.14159265358979323846;
+const double kCal = 2e-3; // ionization dE/dx constant for muons in GeV/cm
+const double kHad = 30e-3;
 
 void SegmentTrajectory(const std::vector<double>& traj_x, const std::vector<double>& traj_y, const std::vector<double>& traj_z,
                        std::vector<size_t>& breakpoints, std::vector<double>& segmentLengths, double segLen) {
@@ -103,21 +110,27 @@ std::vector<double> ComputeYZAngles(const std::vector<std::vector<double>>& segm
 double ModifiedHighland(double p, double segmentLength) {
     double beta = p / std::sqrt(p * p + 0.1396 * 0.1396); // pion mass ~ 139.6 MeV/c^2
     double X0 = 14.0; // radiation length in cm
-    double kappa = 0.1049 / (p * p) + 11.0038;
-    return std::sqrt(std::pow((kappa / (p * beta)) * std::sqrt(segmentLength / X0) * (1 + 0.0038 * std::log(segmentLength / X0)), 2) + std::pow(3.0, 2));
+    return 11 / (p * beta) * std::sqrt(segmentLength / X0) * (1 + 0.0038 * std::log(segmentLength / X0));
 }
 
-double NegativeLogLikelihood(const std::vector<double>& xzAngles, const std::vector<double>& yzAngles, const std::vector<double>& segmentLengths, double p) {
+double ComputeSegmentMomentum(double p_initial, double Li) {
+    double kTotal = kCal + kHad;
+    return p_initial - (kTotal * Li);
+}
+
+double NegativeLogLikelihood(const std::vector<double>& xzAngles, const std::vector<double>& yzAngles, const std::vector<double>& segmentLengths, double p_initial) {
     double nll = 0.0;
     for (size_t i = 0; i < xzAngles.size(); ++i) {
-        double sigma = ModifiedHighland(p, segmentLengths[i]);
-        double deltaThetaXZ = xzAngles[i];
-        nll += std::log(sigma) + (deltaThetaXZ * deltaThetaXZ) / (2 * sigma * sigma);
-    }
-    for (size_t i = 0; i < yzAngles.size(); ++i) {
-        double sigma = ModifiedHighland(p, segmentLengths[i]);
-        double deltaThetaYZ = yzAngles[i];
-        nll += std::log(sigma) + (deltaThetaYZ * deltaThetaYZ) / (2 * sigma * sigma);
+        double Li = (i > 0) ? segmentLengths[i - 1] : 0.0;
+        double p_i = ComputeSegmentMomentum(p_initial, Li);
+        // Apply the hard cut on angles
+        if (std::abs(xzAngles[i]) <= 100.0 && std::abs(yzAngles[i]) <= 100.0) {
+            double sigma = ModifiedHighland(p_i, segmentLengths[i]);
+            double deltaThetaXZ = xzAngles[i];
+            double deltaThetaYZ = yzAngles[i];
+            nll += std::log(sigma) + (deltaThetaXZ * deltaThetaXZ) / (2 * sigma * sigma);
+            nll += std::log(sigma) + (deltaThetaYZ * deltaThetaYZ) / (2 * sigma * sigma);
+        }
     }
     return nll;
 }
@@ -157,7 +170,7 @@ void PlotResiduals(const char* filename) {
 
         double minimisedP = -1;
 
-        std::vector<double> segmentLengthsArray = {0.3, 1, 2, 5, 10};
+        std::vector<double> segmentLengthsArray = { 5, 10};
         std::vector<std::vector<double>> allMomenta(segmentLengthsArray.size());
         std::vector<std::vector<double>> allNLLValues(segmentLengthsArray.size());
         std::vector<double> globalNLLValues(100, 0.0);
@@ -165,41 +178,40 @@ void PlotResiduals(const char* filename) {
         for (size_t segLenIdx = 0; segLenIdx < segmentLengthsArray.size(); ++segLenIdx) {
             double segmentLength = segmentLengthsArray[segLenIdx];
 
-                std::vector<size_t> breakpoints;
-                std::vector<double> segmentLengths;
-                SegmentTrajectory(*traj_x, *traj_y, *traj_z, breakpoints, segmentLengths, segmentLength);
+            std::vector<size_t> breakpoints;
+            std::vector<double> segmentLengths;
+            SegmentTrajectory(*traj_x, *traj_y, *traj_z, breakpoints, segmentLengths, segmentLength);
 
-                std::vector<std::vector<double>> segmentDirections;
-                for (size_t i = 0; i < breakpoints.size() - 1; ++i) {
-                    std::vector<double> direction = ComputeSegmentDirection(*traj_x, *traj_y, *traj_z, breakpoints[i], breakpoints[i + 1]);
-                    segmentDirections.push_back(direction);
-                }
-
-                std::vector<double> XZScatteringAngles = ComputeXZAngles(segmentDirections);
-                std::vector<double> YZScatteringAngles = ComputeYZAngles(segmentDirections);
-
-                std::vector<double>& momenta = allMomenta[segLenIdx];
-                std::vector<double>& nllValues = allNLLValues[segLenIdx];
-
-                double bestP = 0.0;
-                double minNLL = std::numeric_limits<double>::max();
-                for (double p = 0.01; p <= 2; p += 0.01) {
-                    double nll = NegativeLogLikelihood(XZScatteringAngles, YZScatteringAngles, segmentLengths, p);
-                    momenta.push_back(p);
-                    nllValues.push_back(nll);
-                    if (nll < minNLL) {
-                        minNLL = nll;
-                        bestP = p;
-                    }
-                }
-
-                minimisedP = bestP;
+            std::vector<std::vector<double>> segmentDirections;
+            for (size_t i = 0; i < breakpoints.size() - 1; ++i) {
+                std::vector<double> direction = ComputeSegmentDirection(*traj_x, *traj_y, *traj_z, breakpoints[i], breakpoints[i + 1]);
+                segmentDirections.push_back(direction);
             }
+
+            std::vector<double> XZScatteringAngles = ComputeXZAngles(segmentDirections);
+            std::vector<double> YZScatteringAngles = ComputeYZAngles(segmentDirections);
+
+            std::vector<double>& momenta = allMomenta[segLenIdx];
+            std::vector<double>& nllValues = allNLLValues[segLenIdx];
+
+            double bestP = 0.0;
+            double minNLL = std::numeric_limits<double>::max();
+            for (double p = 0.01; p <= 5; p += 0.01) {
+                double nll = NegativeLogLikelihood(XZScatteringAngles, YZScatteringAngles, segmentLengths, p);
+                momenta.push_back(p);
+                nllValues.push_back(nll);
+                if (nll < minNLL) {
+                    minNLL = nll;
+                    bestP = p;
+                }
+            }
+
+            minimisedP = bestP;
 
             for (size_t i = 0; i < allNLLValues[segLenIdx].size() && i < globalNLLValues.size(); ++i) {
                 globalNLLValues[i] += allNLLValues[segLenIdx][i];
             }
-        
+        }
 
         double residual = (minimisedP - trueMomentum) / trueMomentum;
         residuals.push_back(residual);

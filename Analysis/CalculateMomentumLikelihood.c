@@ -1,3 +1,5 @@
+// root -l -b -q 'CalculateMomentumLikelihood.c("Output/piontraj_output.root", 10)'
+
 #include "TFile.h"
 #include "TTree.h"
 #include "TCanvas.h"
@@ -111,14 +113,14 @@ double ModifiedHighland(double p, double segmentLength) {
 double NegativeLogLikelihood(const std::vector<double>& xzAngles, const std::vector<double>& yzAngles, const std::vector<double>& segmentLengths, double p) {
     double nll = 0.0;
     for (size_t i = 0; i < xzAngles.size(); ++i) {
-        double sigma = ModifiedHighland(p, segmentLengths[i]);
-        double deltaThetaXZ = xzAngles[i];
-        nll += std::log(sigma) + (deltaThetaXZ * deltaThetaXZ) / (2 * sigma * sigma);
-    }
-    for (size_t i = 0; i < yzAngles.size(); ++i) {
-        double sigma = ModifiedHighland(p, segmentLengths[i]);
-        double deltaThetaYZ = yzAngles[i];
-        nll += std::log(sigma) + (deltaThetaYZ * deltaThetaYZ) / (2 * sigma * sigma);
+        // Apply the hard cut on angles
+        if (std::abs(xzAngles[i]) <= 100.0 && std::abs(yzAngles[i]) <= 100.0) {
+            double sigma = ModifiedHighland(p, segmentLengths[i]);
+            double deltaThetaXZ = xzAngles[i];
+            double deltaThetaYZ = yzAngles[i];
+            nll += std::log(sigma) + (deltaThetaXZ * deltaThetaXZ) / (2 * sigma * sigma);
+            nll += std::log(sigma) + (deltaThetaYZ * deltaThetaYZ) / (2 * sigma * sigma);
+        }
     }
     return nll;
 }
@@ -127,8 +129,8 @@ void CalculateMomentumLikelihood(const char* filename, int entrynumber) {
     TFile* file = new TFile(filename);
     TTree* tree = (TTree*)file->Get("ana/TrajTree");
 
-    std::vector<std::vector<double>> *traj_x = nullptr, *traj_y = nullptr, *traj_z = nullptr;
-    std::vector<std::vector<double>> *traj_p = nullptr, *traj_e = nullptr;
+    std::vector<double> *traj_x = nullptr, *traj_y = nullptr, *traj_z = nullptr;
+    std::vector<double> *traj_p = nullptr, *traj_e = nullptr;
     tree->SetBranchAddress("traj_x", &traj_x);
     tree->SetBranchAddress("traj_y", &traj_y);
     tree->SetBranchAddress("traj_z", &traj_z);
@@ -146,19 +148,13 @@ void CalculateMomentumLikelihood(const char* filename, int entrynumber) {
     for (size_t segLenIdx = 0; segLenIdx < segmentLengthsArray.size(); ++segLenIdx) {
         double segmentLength = segmentLengthsArray[segLenIdx];
 
-        for (size_t traj_id = 0; traj_id < traj_x->size(); ++traj_id) {
-            const std::vector<double>& x = (*traj_x)[traj_id];
-            const std::vector<double>& y = (*traj_y)[traj_id];
-            const std::vector<double>& z = (*traj_z)[traj_id];
-            const std::vector<double>& e = (*traj_e)[traj_id];
-
             std::vector<size_t> breakpoints;
             std::vector<double> segmentLengths;
-            SegmentTrajectory(x, y, z, breakpoints, segmentLengths, segmentLength);
+            SegmentTrajectory(*traj_x, *traj_y, *traj_z, breakpoints, segmentLengths, segmentLength);
 
             std::vector<std::vector<double>> segmentDirections;
             for (size_t i = 0; i < breakpoints.size() - 1; ++i) {
-                std::vector<double> direction = ComputeSegmentDirection(x, y, z, breakpoints[i], breakpoints[i + 1]);
+                std::vector<double> direction = ComputeSegmentDirection(*traj_x, *traj_y, *traj_z, breakpoints[i], breakpoints[i + 1]);
                 segmentDirections.push_back(direction);
             }
 
@@ -181,7 +177,7 @@ void CalculateMomentumLikelihood(const char* filename, int entrynumber) {
             }
 
             minimisedP = bestP;
-        }
+        
 
         for (size_t i = 0; i < allNLLValues[segLenIdx].size() && i < globalNLLValues.size(); ++i) {
             globalNLLValues[i] += allNLLValues[segLenIdx][i];
