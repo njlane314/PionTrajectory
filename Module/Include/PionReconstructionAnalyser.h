@@ -39,21 +39,25 @@ namespace ubpiontraj
    class PionReconstructionAnalyser 
    {
    public:
-      PionReconstructionAnalyser(art::Event const& event, ubpiontraj::Trajectory traj, 
-                                    std::string recotracklabel, std::string recotrackhitlabel, std::string recohitsimparticlelabel, std::string recocalolabel, 
+      PionReconstructionAnalyser(art::Event const& event, 
+                                    std::string recoparticlelabel, std::string recotracklabel, std::string recohitlabel, std::string recotrackhitassoclabel, std::string recohitsimparticlelabel, std::string recocalolabel, 
                                     bool debug);
       ~PionReconstructionAnalyser();
 
-      void AnalyseEvent(art::Event const& event);
+      void AnalyseTrajectory(ubpiontraj::Trajectory traj);
 
    private:
       ubpiontraj::Trajectory m_Trajectory;
-      const std::vector<art::Ptr<simb::MCParticle>>& m_SelectedSimParticles;
       
+      std::string m_RecoParticleLabel;
       std::string m_RecoTrackLabel;
-      std::string m_RecoTrackHitLabel;
+      std::string m_RecoHitLabel;
+      
+      std::string m_RecoTrackHitAssocLabel;
       std::string m_RecoHitSimParticleLabel;
+
       std::string m_RecoCaloLabel;
+
       bool m_Debug;
 
       art::Handle<std::vector<recob::PFParticle>> m_RecoParticleHandle;
@@ -67,7 +71,9 @@ namespace ubpiontraj
 
       art::FindManyP<recob::Track>* m_RecoParticleTrackAssoc;
       art::FindManyP<recob::Hit>* m_RecoTrackHitAssoc;
+
       art::FindMany<simb::MCParticle, anab::BackTrackerHitMatchingData>* m_RecoHitSimParticleAssoc;
+
       art::FindManyP<anab::Calorimetry>* m_RecoTrackCaloAssoc;
    };
 }

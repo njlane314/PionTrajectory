@@ -3,22 +3,22 @@
 //_________________________________________________________________________________________
 namespace ubpiontraj {
 //_________________________________________________________________________________________
-PionSimulationAnalyser::PionSimulationAnalyser(art::Event const& event, std::string simlabel, bool debug) :
-   m_SimLabel(simlabel),
+PionSimulationAnalyser::PionSimulationAnalyser(art::Event const& event, std::string simparticlelabel, bool debug) :
+   m_SimParticleLabel(simparticlelabel),
    m_Debug(debug)
 {
    if (m_Debug) {
-       std::cout << ">>> [PionSimulationAnalyser] Initializing with simulation label: " << simlabel << std::endl;
+       std::cout << ">>> [PionSimulationAnalyser] Initializing with simulation label: " << simparticlelabel << std::endl;
    }
 
-   if (!event.getByLabel(m_SimLabel, m_SimHandle)) {
+   if (!event.getByLabel(m_SimParticleLabel, m_SimParticleHandle)) {
        if (m_Debug) {
-           std::cerr << ">>> [PionSimulationAnalyser] Error: Could not get simulation handle for label: " << m_SimLabel << std::endl;
+           std::cerr << ">>> [PionSimulationAnalyser] Error: Could not get simulation handle for label: " << m_SimParticleLabel << std::endl;
        }
        return;
    }
 
-   art::fill_ptr_vector(m_SimParticles, m_SimHandle);
+   art::fill_ptr_vector(m_SimParticles, m_SimParticleHandle);
 
    for (const art::Ptr<simb::MCParticle>& initialparticle : m_SimParticles) {
       m_SimParticleMap.insert(std::make_pair(initialparticle->TrackId(), initialparticle));
@@ -39,8 +39,9 @@ void PionSimulationAnalyser::AnalyseEvent(art::Event const& event)
 
    bool pionfound = false;
    for (art::Ptr<simb::MCParticle>& particle : m_SimParticles) {
-      if (isChargedPion(particle->PdgCode()) && particle->Process() == "primary") {
+      if (isChargedPion(particle->PdgCode()) && (particle->Process() == "decay" || particle->Process() == "primary")) {
          initialparticle = particle;
+         
          pionfound = true;
          break;
       }

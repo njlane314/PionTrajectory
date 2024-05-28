@@ -55,10 +55,15 @@ class ubpiontraj::PionTrajectoryAnalyser : public art::EDAnalyzer
       void endSubRun(const art::SubRun& sr);
 
    private:
-      std::string m_SimLabel;
+      std::string m_SimParticleLabel;
+      
+      std::string m_RecoParticleLabel;
       std::string m_RecoTrackLabel;
-      std::string m_RecoTrackHitLabel;
+      std::string m_RecoHitLabel;
+      
+      std::string m_RecoTrackHitAssocLabel;
       std::string m_RecoHitSimParticleLabel;
+
       std::string m_RecoCaloLabel;
       bool m_Debug;
       

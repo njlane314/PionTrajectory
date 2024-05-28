@@ -28,7 +28,7 @@ namespace ubpiontraj
    class PionSimulationAnalyser 
    {
    public:
-      PionSimulationAnalyser(art::Event const& event, std::string simlabel, bool debug);
+      PionSimulationAnalyser(art::Event const& event, std::string simparticlelabel, bool debug);
       ~PionSimulationAnalyser();
 
       void AnalyseEvent(art::Event const& event);
@@ -36,8 +36,9 @@ namespace ubpiontraj
       Trajectory GetTrajectory() {return m_Trajectory;}
 
    private:
-      art::Handle<std::vector<simb::MCParticle>> m_SimHandle;
-      std::string m_SimLabel;
+      art::Handle<std::vector<simb::MCParticle>> m_SimParticleHandle;
+      std::string m_SimParticleLabel;
+      
       bool m_Debug;
 
       std::vector<art::Ptr<simb::MCParticle>> m_SimParticles;

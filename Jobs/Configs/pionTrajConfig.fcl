@@ -3,9 +3,11 @@ BEGIN_PROLOG
 pion_trajectory_analysis:
 {
         module_type: PionTrajectoryAnalyser
-        sim_label: "largeant"
-        reco_label: "pandora"
-        reco_trackhit_label: "pandora"
+        sim_particle_label: "largeant"
+        reco_particle_label: "pandora"
+        reco_track_label: "pandora"
+        reco_hit_label: "gaushit"
+        reco_tracksimparticlelabel: "pandora"
         reco_hitsimparticle_label: "gaushitTruthMatch"
         reco_calo_label: "pandoracali"
         debug: true

@@ -27,6 +27,12 @@ namespace ubpiontraj {
         void AddPoint(const TLorentzVector& position, const TLorentzVector& momentum, const std::string& process);
         void SetProcess(size_t index, const std::string& process);
         void AddSimParticle(const art::Ptr<simb::MCParticle>& particle);
+
+        void AddRecoPoint(const TVector3& xyz, double dEdx) {
+            m_reco_xyz.push_back(xyz);
+            m_reco_dEdx.push_back(dEdx);
+        }
+
         const std::vector<TLorentzVector>& GetPositions() const;
         const std::vector<TLorentzVector>& GetMomenta() const;
         const std::vector<double>& GetEnergies() const;
@@ -39,6 +45,9 @@ namespace ubpiontraj {
         std::vector<double> energies;
         std::vector<std::string> processes;
         std::vector<art::Ptr<simb::MCParticle>> simParticles;
+
+        std::vector<TVector3> m_reco_xyz;
+        std::vector<double> m_reco_dEdx;
     };
 }
 

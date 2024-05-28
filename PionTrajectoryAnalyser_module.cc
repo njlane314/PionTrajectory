@@ -2,13 +2,19 @@
 //_________________________________________________________________________________________
 ubpiontraj::PionTrajectoryAnalyser::PionTrajectoryAnalyser(fhicl::ParameterSet const& p) : 
    EDAnalyzer{p},
-   m_SimLabel(p.get<std::string>("sim_label", "largeant")),
-   m_RecoTrackLabel(p.get<std::string>("reco_label", "pandora")),
-   m_RecoTrackHitLabel(p.get<std::string>("reco_trackhit_label", "pandora")),
+   m_SimParticleLabel(p.get<std::string>("sim_particle_label", "largeant")),
+   m_RecoParticleLabel(p.get<std::string>("reco_particle_label", "pandora")),
+   m_RecoTrackLabel(p.get<std::string>("reco_track_label", "pandora")),
+   m_RecoHitLabel(p.get<std::string>("reco_hit_label", "pandora")),
+   m_RecoTrackHitAssocLabel(p.get<std::string>("reco_trackhitassoc_label", "pandora")),
    m_RecoHitSimParticleLabel(p.get<std::string>("reco_hitsimparticle_label", "gaushitTruthMatch")),
    m_RecoCaloLabel(p.get<std::string>("reco_calo_label", "pandoracali")),
    m_Debug(p.get<bool>("debug", false))
-{}
+{
+    if (m_Debug) {
+       std::cout << ">>> [PionTrajectoryAnalyser] Constructing class." << std::endl;
+   }
+}
 //_________________________________________________________________________________________
 void ubpiontraj::PionTrajectoryAnalyser::beginJob()
 {
@@ -44,12 +50,15 @@ void ubpiontraj::PionTrajectoryAnalyser::analyze(art::Event const& e)
       std::cout << ">>> [PionTrajectoryAnalyser] Analyzing event: " << e.id() << std::endl;
    }
 
-   PionSimulationAnalyser* piSimAna = new PionSimulationAnalyser(e, m_SimLabel, m_Debug);
+   PionSimulationAnalyser* piSimAna = new PionSimulationAnalyser(e, m_SimParticleLabel, m_Debug);
    piSimAna->AnalyseEvent(e);
 
    ubpiontraj::Trajectory trajectory = piSimAna->GetTrajectory();
-   PionReconstructionAnalyser* piRecoAna = new PionReconstructionAnalyser(e, trajectory, m_RecoTrackLabel, m_RecoTrackHitLabel, m_RecoHitSimParticleLabel, m_RecoCaloLabel, m_Debug);
-
+   PionReconstructionAnalyser* piRecoAna = new PionReconstructionAnalyser(e, 
+                                                                        m_RecoParticleLabel, m_RecoParticleLabel,  m_RecoHitLabel, m_RecoTrackHitAssocLabel, m_RecoHitSimParticleLabel, m_RecoCaloLabel, 
+                                                                        m_Debug);
+   piRecoAna->AnalyseTrajectory(trajectory);
+   
    m_traj_n = 0;
    m_traj_x.clear();
    m_traj_y.clear();
